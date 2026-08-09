@@ -1,0 +1,363 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap');
+
+:root {
+  /* Minimalist Dark Theme */
+  --bg-color: #000000;
+  --surface-color: #09090b;
+  --surface-hover: #18181b;
+
+  --text-primary: #ffffff;
+  --text-secondary: #a1a1aa;
+  --text-tertiary: #71717a;
+
+  --border-color: #27272a;
+  --border-hover: #3f3f46;
+
+  --accent: #ffffff;
+  --accent-inverse: #000000;
+
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --transition-fast: all 0.15s ease;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+a:hover {
+  color: var(--accent);
+}
+
+/* Clean Panel */
+.clean-panel {
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+/* Clean Inputs */
+.input-clean {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: var(--transition-fast);
+}
+
+.input-clean:focus {
+  outline: none;
+  border-color: var(--text-secondary);
+  background: var(--surface-hover);
+}
+
+.input-clean::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Clean Labels */
+.label-clean {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+/* Clean Buttons */
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-inverse);
+  border: 1px solid var(--accent);
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.btn-primary:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.btn-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  padding: 0.75rem 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-secondary:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-hover);
+}
+
+/* Clean File Uploader Area */
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed var(--border-color);
+  border-radius: 8px;
+  height: 200px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  background: var(--surface-color);
+  position: relative;
+  overflow: hidden;
+}
+
+.upload-zone:hover {
+  border-color: var(--text-secondary);
+  background: var(--surface-hover);
+}
+
+.upload-overlay {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  text-align: center;
+  padding: 0.5rem;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  border-top: 1px solid var(--border-color);
+}
+
+/* Checkbox Toggle */
+.toggle-checkbox {
+  appearance: none;
+  width: 44px;
+  height: 24px;
+  background: var(--border-color);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition-fast);
+}
+
+.toggle-checkbox::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--text-primary);
+  border-radius: 50%;
+  transition: var(--transition-fast);
+}
+
+.toggle-checkbox:checked {
+  background: var(--accent);
+}
+
+.toggle-checkbox:checked::after {
+  transform: translateX(20px);
+  background: var(--accent-inverse);
+}
+
+/* Responsive Grid utility */
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Product Page Responsive Styles */
+.gallery-thumbnail-item {
+  width: 80px;
+  height: 100px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gallery-featured {
+  flex: 1;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--surface-color);
+  height: 70vh;
+  position: relative;
+}
+
+.gallery-main {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.sticky-gallery {
+  position: sticky;
+  top: 100px;
+}
+
+.gallery-thumbnails {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 80px;
+  flex-shrink: 0;
+}
+
+.gallery-mobile {
+  display: none;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 1rem;
+  scrollbar-width: none;
+}
+
+.gallery-mobile::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery-mobile-item {
+  min-width: 85vw;
+  height: 60vh;
+  border-radius: 12px;
+  scroll-snap-align: center;
+}
+
+@media (max-width: 1024px) {
+  .product-layout {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  .gallery-main {
+    display: none !important;
+  }
+
+  .gallery-mobile {
+    display: flex !important;
+  }
+}
+
+/* Admin Layout Responsive */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #000;
+  color: #fff;
+}
+
+.admin-sidebar {
+  width: 280px;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+.admin-main {
+  flex: 1;
+  padding: 3vw 4vw;
+  overflow-y: auto;
+  min-width: 0;
+}
+
+.admin-content-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .admin-layout {
+    flex-direction: column;
+  }
+
+  .admin-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: 1.5rem 1rem;
+    height: auto;
+  }
+
+  .admin-nav {
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .admin-nav-title {
+    display: none;
+  }
+
+  .admin-nav a {
+    padding: 0.5rem 0.75rem !important;
+    font-size: 0.85rem;
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .admin-main {
+    padding: 1.5rem;
+    overflow-y: visible;
+  }
+}
