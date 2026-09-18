@@ -54,7 +54,7 @@ export default function ProductsPage() {
                             products.map((product) => (
                                 <tr key={product.id} style={{ borderBottom: '1px solid var(--border-color)', transition: 'var(--transition-fast)' }}>
                                     <td style={{ padding: '1rem 1.5rem' }}>
-                                        <div style={{ width: '50px', height: '50px', background: product.mainImageUrl ? `url(${product.mainImageUrl}) center/cover` : 'var(--border-color)', borderRadius: '6px' }} />
+                                        <div style={(product.mainImageUrl || product.imageUrl) ? { width: '50px', height: '50px', backgroundImage: `url('${product.mainImageUrl || product.imageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center', borderRadius: '6px' } : { width: '50px', height: '50px', background: 'var(--border-color)', borderRadius: '6px' }} />
                                     </td>
                                     <td style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>
                                         {product.name}

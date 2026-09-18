@@ -40,6 +40,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
 
     // Images
     const [mainImageUrl, setMainImageUrl] = useState('');
+    const [galleryImages, setGalleryImages] = useState<string[]>([]);
     const [sizeChartUrl, setSizeChartUrl] = useState('');
 
     // Variants
@@ -61,6 +62,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                     setDiscountedPrice(data.discountedPrice?.toString() || data.actualPrice?.toString() || data.price?.toString() || '');
                     setInStock(data.inStock?.toString() || '0');
                     setMainImageUrl(data.mainImageUrl || data.imageUrl || '');
+                    setGalleryImages(data.galleryImages || []);
                     setSizeChartUrl(data.sizeChartUrl || '');
                     setVariants(data.variants || []);
                 } else {
@@ -144,6 +146,18 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
         setLoading(false);
     };
 
+    const uploadGalleryImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.[0]) return;
+        setLoading(true);
+        const url = await handleImageUpload(e.target.files[0]);
+        if (url) setGalleryImages(prev => [...prev, url]);
+        setLoading(false);
+    };
+
+    const removeGalleryImage = (indexToRemove: number) => {
+        setGalleryImages(prev => prev.filter((_, index) => index !== indexToRemove));
+    };
+
     const uploadVariantImage = async (variantId: string, e: React.ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.[0]) return;
         setLoading(true);
@@ -174,6 +188,9 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        if (!name || !description || !category || !actualPrice || !inStock) {
+            return alert("Please fill in all required fields (Name, Category, Description, Price, and Inventory).");
+        }
         if (!mainImageUrl) return alert("Please upload a main product image.");
         setLoading(true);
         setSuccess(false);
@@ -189,6 +206,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                 discountPercent,
                 inStock: parseInt(inStock),
                 mainImageUrl,
+                galleryImages,
                 sizeChartUrl,
                 variants,
                 updatedAt: new Date()
@@ -196,9 +214,9 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
 
             setSuccess(true);
             window.scrollTo({ top: 0, behavior: 'smooth' });
-        } catch (error) {
+        } catch (error: any) {
             console.error("Error updating product: ", error);
-            alert("Failed to update product.");
+            alert("Failed to update product. Error: " + (error?.message || JSON.stringify(error)));
         } finally {
             setLoading(false);
         }
@@ -286,7 +304,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                         {/* Main Image */}
                         <div>
                             <label className="label-clean">Main Image *</label>
-                            <label className="upload-zone" style={{ background: mainImageUrl ? `url(${mainImageUrl}) center/cover no-repeat` : '' }}>
+                            <label className="upload-zone" style={mainImageUrl ? { backgroundImage: `url('${mainImageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
                                 {!mainImageUrl && (
                                     <>
                                         <UploadCloud size={32} color="var(--text-secondary)" style={{ marginBottom: '1rem' }} />
@@ -301,7 +319,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                         {/* Size Chart */}
                         <div>
                             <label className="label-clean">Size Guide (Optional)</label>
-                            <label className="upload-zone" style={{ background: sizeChartUrl ? `url(${sizeChartUrl}) center/contain no-repeat` : '' }}>
+                            <label className="upload-zone" style={sizeChartUrl ? { backgroundImage: `url('${sizeChartUrl}')`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
                                 {!sizeChartUrl && (
                                     <>
                                         <UploadCloud size={32} color="var(--text-tertiary)" style={{ marginBottom: '1rem' }} />
@@ -311,6 +329,25 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                                 <input type="file" accept="image/*" onChange={uploadSizeChart} style={{ display: 'none' }} />
                                 {sizeChartUrl && <div className="upload-overlay">Replace Size Chart</div>}
                             </label>
+                        </div>
+
+                        {/* Gallery Images */}
+                        <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+                            <label className="label-clean">Additional Gallery Images</label>
+                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                {galleryImages.map((img, index) => (
+                                    <div key={index} style={{ width: '100px', height: '100px', borderRadius: '6px', background: `url('${img}') center/cover no-repeat`, position: 'relative' }}>
+                                        <button type="button" onClick={() => removeGalleryImage(index)} style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: '2px solid var(--bg-color)' }}>
+                                            <Trash2 size={12} />
+                                        </button>
+                                    </div>
+                                ))}
+
+                                <label className="upload-zone" style={{ width: '100px', height: '100px', minHeight: '100px', padding: 0 }}>
+                                    <Plus size={24} color="var(--text-tertiary)" />
+                                    <input type="file" accept="image/*" onChange={uploadGalleryImage} style={{ display: 'none' }} />
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -364,7 +401,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                                 {/* Variant Image */}
                                 <div style={{ flexShrink: 0 }}>
                                     <label className="label-clean">Image</label>
-                                    <label className="upload-zone" style={{ width: '120px', height: '120px', borderRadius: '6px', background: variant.imageUrl ? `url(${variant.imageUrl}) center/cover` : '' }}>
+                                    <label className="upload-zone" style={variant.imageUrl ? { width: '120px', height: '120px', borderRadius: '6px', backgroundImage: `url('${variant.imageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : { width: '120px', height: '120px', borderRadius: '6px' }}>
                                         {!variant.imageUrl && <UploadCloud size={24} color="var(--text-tertiary)" />}
                                         <input type="file" accept="image/*" onChange={(e) => uploadVariantImage(variant.id, e)} style={{ display: 'none' }} />
                                         {variant.imageUrl && <div className="upload-overlay" style={{ fontSize: '0.7rem' }}>Replace</div>}

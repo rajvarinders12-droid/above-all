@@ -22,6 +22,10 @@ export default function Navbar() {
     const [products, setProducts] = useState<any[]>([]);
     const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
     const [isFetchingProducts, setIsFetchingProducts] = useState(false);
+
+    // Categories for Navbar Menu
+    const [navCategories, setNavCategories] = useState<{ id: string, name: string }[]>([]);
+
     const searchInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -39,8 +43,24 @@ export default function Navbar() {
             document.body.style.overflow = 'auto';
         }
 
+        const fetchCategories = async () => {
+            if (navCategories.length > 0) return;
+            try {
+                const snap = await getDocs(collection(db, 'categories'));
+                const cats = snap.docs.map(doc => ({ id: doc.id, name: doc.data().name }));
+                cats.sort((a, b) => a.name.localeCompare(b.name));
+                setNavCategories(cats);
+            } catch (err) {
+                console.error("Error fetching categories for navbar", err);
+            }
+        };
+
+        if (menuOpen) {
+            fetchCategories();
+        }
+
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [menuOpen, searchOpen]);
+    }, [menuOpen, searchOpen, navCategories.length]);
 
     // Fetch products once when search is opened
     useEffect(() => {
@@ -182,20 +202,47 @@ export default function Navbar() {
                 }}>
                     {/* Left Column: Main Links */}
                     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                        {[
-                            { label: 'All Pieces', href: '/collection', num: '01' },
-                            { label: 'Oversized T-Shirts', href: '/category/oversized', num: '02' },
-                            { label: 'Hoodies', href: '/category/hoodies', num: '03' },
-                            { label: 'Bottoms', href: '/category/bottoms', num: '04' },
-                        ].map((link, index) => (
-                            <div key={index} style={{
+                        <div style={{
+                            borderBottom: '1px solid rgba(255,255,255,0.05)',
+                            opacity: menuOpen ? 1 : 0,
+                            transform: menuOpen ? 'translateY(0)' : 'translateY(40px)',
+                            transition: menuOpen ? `all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s` : 'all 0.3s ease',
+                        }}>
+                            <Link
+                                href={'/products'}
+                                onClick={() => setMenuOpen(false)}
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    textDecoration: 'none',
+                                    color: '#fff',
+                                    width: '100%',
+                                }}
+                                className="main-menu-link"
+                            >
+                                <span className="menu-link-text">
+                                    All Pieces
+                                </span>
+                                <span style={{
+                                    fontSize: '0.75rem',
+                                    letterSpacing: '0.2em',
+                                    color: 'rgba(255,255,255,0.5)',
+                                    fontFamily: 'sans-serif'
+                                }}>
+                                    01
+                                </span>
+                            </Link>
+                        </div>
+                        {navCategories.map((cat, index) => (
+                            <div key={cat.id} style={{
                                 borderBottom: '1px solid rgba(255,255,255,0.05)',
                                 opacity: menuOpen ? 1 : 0,
                                 transform: menuOpen ? 'translateY(0)' : 'translateY(40px)',
-                                transition: menuOpen ? `all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${0.2 + (index * 0.1)}s` : 'all 0.3s ease',
+                                transition: menuOpen ? `all 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94) ${0.2 + ((index + 1) * 0.1)}s` : 'all 0.3s ease',
                             }}>
                                 <Link
-                                    href={link.href}
+                                    href={`/category/${cat.name.toLowerCase().replace(/\\s+/g, '-')}`}
                                     onClick={() => setMenuOpen(false)}
                                     style={{
                                         display: 'flex',
@@ -208,7 +255,7 @@ export default function Navbar() {
                                     className="main-menu-link"
                                 >
                                     <span className="menu-link-text">
-                                        {link.label}
+                                        {cat.name}
                                     </span>
                                     <span style={{
                                         fontSize: '0.75rem',
@@ -216,7 +263,7 @@ export default function Navbar() {
                                         color: 'rgba(255,255,255,0.5)',
                                         fontFamily: 'sans-serif'
                                     }}>
-                                        {link.num}
+                                        {(index + 2).toString().padStart(2, '0')}
                                     </span>
                                 </Link>
                             </div>

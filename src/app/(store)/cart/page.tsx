@@ -22,87 +22,7 @@ export default function CartPage() {
     const total = getCartTotal();
     const router = useRouter();
 
-    const handlePayment = async () => {
-        if (total <= 0) return;
-        setIsVerifying(true);
 
-        const saveOrderToFirebase = async (paymentId: string) => {
-            try {
-                await addDoc(collection(db, 'orders'), {
-                    orderId: paymentId,
-                    items: items,
-                    totalAmount: total,
-                    status: 'Processing',
-                    customerName: "Test Customer",
-                    customerEmail: "test@example.com",
-                    createdAt: serverTimestamp()
-                });
-            } catch (e) {
-                console.error("Firebase Order Save Error:", e);
-            }
-        };
-
-        try {
-            const res = await fetch('/api/create-order', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: total })
-            });
-            const order = await res.json();
-
-            if (order.error) {
-                alert("Failed to initialize payment. Check API key configuration.");
-                setIsVerifying(false);
-                return;
-            }
-
-            if (order.isMock) {
-                await saveOrderToFirebase('mock_' + Date.now());
-                alert("[TEST MODE]: Payment successful! Your order has been placed securely.");
-                clearCart();
-                setIsVerifying(false);
-                router.push('/');
-                return;
-            }
-
-            const options = {
-                key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_YourTestKeyHere',
-                amount: order.amount,
-                currency: order.currency,
-                name: "ABOVA | Above All",
-                description: "Purchase from Above All Store",
-                order_id: order.id,
-                handler: async function (response: any) {
-                    console.log("PAYMENT SUCCESS:", response);
-                    await saveOrderToFirebase(response.razorpay_order_id || 'manual');
-                    alert("Payment successful! Your order has been placed.");
-                    clearCart();
-                    router.push('/');
-                },
-                prefill: {
-                    name: "Customer Name",
-                    email: "customer@example.com",
-                    contact: "9999999999"
-                },
-                theme: {
-                    color: "#000000"
-                }
-            };
-
-            const paymentObject = new (window as any).Razorpay(options);
-            paymentObject.on('payment.failed', function (response: any) {
-                alert("Payment failed: " + response.error.description);
-            });
-
-            paymentObject.open();
-
-        } catch (error) {
-            console.error(error);
-            alert("Something went wrong initializing payment.");
-        } finally {
-            setIsVerifying(false);
-        }
-    };
 
     if (!mounted) return <main style={{ minHeight: '100vh', background: 'var(--bg-color)' }}><Navbar /></main>;
 
@@ -192,20 +112,19 @@ export default function CartPage() {
                                 </div>
                             </div>
 
-                            <button
-                                onClick={handlePayment}
-                                disabled={isVerifying}
+                            <Link
+                                href="/checkout"
                                 style={{
                                     width: '100%', padding: '1.25rem', background: 'var(--text-primary)', color: 'var(--bg-color)',
                                     border: 'none', borderRadius: '4px', fontSize: '0.95rem', fontWeight: 600, letterSpacing: '0.1em',
-                                    textTransform: 'uppercase', cursor: isVerifying ? 'wait' : 'pointer',
+                                    textTransform: 'uppercase', textDecoration: 'none',
                                     display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem',
                                     transition: 'background 0.2s'
                                 }}
                             >
                                 <Lock size={16} />
-                                {isVerifying ? 'Processing...' : 'Checkout Securley'}
-                            </button>
+                                Checkout Securely
+                            </Link>
 
                             <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
                                 <p>Secured by Razorpay.</p>

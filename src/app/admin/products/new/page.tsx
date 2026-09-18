@@ -34,6 +34,7 @@ export default function AddProductPage() {
 
   // Images
   const [mainImageUrl, setMainImageUrl] = useState('');
+  const [galleryImages, setGalleryImages] = useState<string[]>([]);
   const [sizeChartUrl, setSizeChartUrl] = useState('');
 
   // Variants
@@ -112,6 +113,18 @@ export default function AddProductPage() {
     setLoading(false);
   };
 
+  const uploadGalleryImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files?.[0]) return;
+    setLoading(true);
+    const url = await handleImageUpload(e.target.files[0]);
+    if (url) setGalleryImages(prev => [...prev, url]);
+    setLoading(false);
+  };
+
+  const removeGalleryImage = (indexToRemove: number) => {
+    setGalleryImages(prev => prev.filter((_, index) => index !== indexToRemove));
+  };
+
   const uploadVariantImage = async (variantId: string, e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
     setLoading(true);
@@ -142,6 +155,9 @@ export default function AddProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!name || !description || !category || !actualPrice || !inStock) {
+      return alert("Please fill in all required fields (Name, Category, Description, Price, and Inventory).");
+    }
     if (!mainImageUrl) return alert("Please upload a main product image.");
     setLoading(true);
     setSuccess(false);
@@ -157,17 +173,18 @@ export default function AddProductPage() {
         discountPercent,
         inStock: parseInt(inStock),
         mainImageUrl,
+        galleryImages,
         sizeChartUrl,
         variants,
         createdAt: new Date()
       });
 
       setSuccess(true);
-      setName(''); setDescription(''); setCategory(''); setActualPrice(''); setDiscountedPrice(''); setMainImageUrl(''); setVariants([]);
+      setName(''); setDescription(''); setCategory(''); setActualPrice(''); setDiscountedPrice(''); setMainImageUrl(''); setGalleryImages([]); setVariants([]);
       window.scrollTo({ top: 0, behavior: 'smooth' });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error adding product: ", error);
-      alert("Failed to save product to database.");
+      alert("Failed to save product to database. Error: " + (error?.message || JSON.stringify(error)));
     } finally {
       setLoading(false);
     }
@@ -211,23 +228,20 @@ export default function AddProductPage() {
             </div>
             <div>
               <label className="label-clean">Category *</label>
-              {existingCategories.length === 0 ? (
-                <div style={{ padding: '0.75rem', background: 'var(--bg-color)', borderRadius: '6px', fontSize: '0.9rem', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}>
-                  No categories found. Please create categories in the admin dashboard first.
-                </div>
-              ) : (
-                <select
-                  required
-                  value={category}
-                  onChange={e => setCategory(e.target.value)}
-                  className="input-clean"
-                >
-                  <option value="" disabled>Select a category</option>
-                  {existingCategories.map((cat, i) => (
-                    <option key={i} value={cat}>{cat}</option>
-                  ))}
-                </select>
-              )}
+              <input
+                type="text"
+                list="category-suggestions"
+                placeholder="Select existing or type a new category"
+                required
+                value={category}
+                onChange={e => setCategory(e.target.value)}
+                className="input-clean"
+              />
+              <datalist id="category-suggestions">
+                {existingCategories.map((cat, i) => (
+                  <option key={i} value={cat} />
+                ))}
+              </datalist>
             </div>
             <div>
               <label className="label-clean">Description *</label>
@@ -255,7 +269,7 @@ export default function AddProductPage() {
             {/* Main Image */}
             <div>
               <label className="label-clean">Main Image *</label>
-              <label className="upload-zone" style={{ background: mainImageUrl ? `url(${mainImageUrl}) center/cover no-repeat` : '' }}>
+              <label className="upload-zone" style={mainImageUrl ? { backgroundImage: `url('${mainImageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
                 {!mainImageUrl && (
                   <>
                     <UploadCloud size={32} color="var(--text-secondary)" style={{ marginBottom: '1rem' }} />
@@ -270,7 +284,7 @@ export default function AddProductPage() {
             {/* Size Chart */}
             <div>
               <label className="label-clean">Size Guide (Optional)</label>
-              <label className="upload-zone" style={{ background: sizeChartUrl ? `url(${sizeChartUrl}) center/contain no-repeat` : '' }}>
+              <label className="upload-zone" style={sizeChartUrl ? { backgroundImage: `url('${sizeChartUrl}')`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
                 {!sizeChartUrl && (
                   <>
                     <UploadCloud size={32} color="var(--text-tertiary)" style={{ marginBottom: '1rem' }} />
@@ -280,6 +294,25 @@ export default function AddProductPage() {
                 <input type="file" accept="image/*" onChange={uploadSizeChart} style={{ display: 'none' }} />
                 {sizeChartUrl && <div className="upload-overlay">Replace Size Chart</div>}
               </label>
+            </div>
+
+            {/* Gallery Images */}
+            <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+              <label className="label-clean">Additional Gallery Images</label>
+              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                {galleryImages.map((img, index) => (
+                  <div key={index} style={{ width: '100px', height: '100px', borderRadius: '6px', background: `url('${img}') center/cover no-repeat`, position: 'relative' }}>
+                    <button type="button" onClick={() => removeGalleryImage(index)} style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: '2px solid var(--bg-color)' }}>
+                      <Trash2 size={12} />
+                    </button>
+                  </div>
+                ))}
+
+                <label className="upload-zone" style={{ width: '100px', height: '100px', minHeight: '100px', padding: 0 }}>
+                  <Plus size={24} color="var(--text-tertiary)" />
+                  <input type="file" accept="image/*" onChange={uploadGalleryImage} style={{ display: 'none' }} />
+                </label>
+              </div>
             </div>
           </div>
         </div>
@@ -333,7 +366,7 @@ export default function AddProductPage() {
                 {/* Variant Image */}
                 <div style={{ flexShrink: 0 }}>
                   <label className="label-clean">Image</label>
-                  <label className="upload-zone" style={{ width: '120px', height: '120px', borderRadius: '6px', background: variant.imageUrl ? `url(${variant.imageUrl}) center/cover` : '' }}>
+                  <label className="upload-zone" style={variant.imageUrl ? { width: '120px', height: '120px', borderRadius: '6px', backgroundImage: `url('${variant.imageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : { width: '120px', height: '120px', borderRadius: '6px' }}>
                     {!variant.imageUrl && <UploadCloud size={24} color="var(--text-tertiary)" />}
                     <input type="file" accept="image/*" onChange={(e) => uploadVariantImage(variant.id, e)} style={{ display: 'none' }} />
                     {variant.imageUrl && <div className="upload-overlay" style={{ fontSize: '0.7rem' }}>Replace</div>}

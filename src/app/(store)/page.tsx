@@ -1,5 +1,5 @@
 import FeaturedProducts from '@/components/FeaturedProducts';
-import CategoryCard from '@/components/CategoryCard';
+import DynamicCategories from '@/components/DynamicCategories';
 import Link from 'next/link';
 
 export default function Home() {
@@ -23,7 +23,7 @@ export default function Home() {
         <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 1rem' }}>
           <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(3rem, 10vw, 5.5rem)', letterSpacing: '0.25em', margin: 0, fontWeight: 800, textTransform: 'uppercase', textShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>ABOVE ALL</h1>
           <p style={{ marginTop: '1.5rem', fontSize: 'clamp(0.7rem, 3vw, 0.9rem)', letterSpacing: '0.25em', textTransform: 'uppercase', opacity: 0.9, textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>Elevated essentials for the modern lifestyle.</p>
-          <Link href="/collection" style={{ display: 'inline-block', marginTop: '3.5rem', padding: '1.25rem 3.5rem', background: '#ffffff', color: '#000000', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.15em', fontWeight: 700, transition: 'var(--transition-fast)' }}>
+          <Link href="/products" style={{ display: 'inline-block', marginTop: '3.5rem', padding: '1.25rem 3.5rem', background: '#ffffff', color: '#000000', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.15em', fontWeight: 700, transition: 'var(--transition-fast)' }}>
             DISCOVER COLLECTION
           </Link>
         </div>
@@ -86,30 +86,14 @@ export default function Home() {
 
       {/* 3. Categories Grid */}
       <section style={{ padding: '0 1rem 8rem', maxWidth: '1800px', margin: '0 auto', width: '100%' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '1rem' }}>
-
-          {/* Category 1 */}
-          <CategoryCard
-            href="/category/oversized"
-            imageUrl="/1.PNG"
-            title="Oversized T-Shirts"
-          />
-
-          {/* Category 2 */}
-          <CategoryCard
-            href="/category/hoodies"
-            imageUrl="/2.PNG"
-            title="Hoodies"
-          />
-
-          {/* Category 3 */}
-          <CategoryCard
-            href="/category/bottoms"
-            imageUrl="/3.PNG"
-            title="Bottoms"
-          />
-
+        <div style={{ textAlign: 'center', marginBottom: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+          <span style={{ fontSize: '0.8rem', letterSpacing: '0.25em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>Discover</span>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>
+            Shop By Collection
+          </h2>
+          <div style={{ width: '40px', height: '1px', background: 'rgba(255,255,255,0.3)' }} />
         </div>
+        <DynamicCategories />
       </section>
 
       {/* 4. Brand Chapters */}
@@ -144,12 +128,47 @@ export default function Home() {
             <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '3.5rem', fontWeight: 400 }}>
               The Collection
             </h2>
-            <Link href="/collection" style={{ textDecoration: 'none', background: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '1rem 3rem', fontSize: '0.75rem', letterSpacing: '0.1em', transition: 'var(--transition-fast)' }}>
+            <Link href="/products" style={{ textDecoration: 'none', background: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '1rem 3rem', fontSize: '0.75rem', letterSpacing: '0.1em', transition: 'var(--transition-fast)' }}>
               VIEW ALL
             </Link>
           </div>
 
           <FeaturedProducts />
+        </div>
+      </section>
+
+      {/* 6. About Us CTA */}
+      <section style={{ padding: '8rem 2rem', background: '#0a0a0a', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '6rem' }}>
+
+          {/* Left Text */}
+          <div style={{ flex: '1 1 400px', display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 4.5vw, 3.5rem)', fontWeight: 400, color: '#fff', marginBottom: '1.5rem', textTransform: 'uppercase', lineHeight: '1.1' }}>
+              The Abova<br />Story
+            </h2>
+            <div style={{ width: '40px', height: '1px', background: 'rgba(255,255,255,0.5)', marginBottom: '2rem' }} />
+            <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1.1rem', lineHeight: '1.8', marginBottom: '2.5rem', maxWidth: '500px' }}>
+              <span style={{ fontStyle: 'italic', fontSize: '1.2rem', color: '#fff' }}>"Quality over everything."</span>
+              <br /><br />
+              At Above All, we keep things simple. We design premium, comfortable essentials that fit beautifully into your everyday life—so you can always look and feel your absolute best.
+            </p>
+            <Link href="/about" style={{ display: 'inline-block', padding: '1rem 3rem', background: '#ffffff', color: '#000000', textDecoration: 'none', fontSize: '0.75rem', letterSpacing: '0.15em', fontWeight: 700, transition: 'var(--transition-fast)' }}>
+              ABOUT ABOVA
+            </Link>
+          </div>
+
+          {/* Right Image */}
+          <div style={{ flex: '1 1 400px' }}>
+            <div style={{
+              width: '100%',
+              aspectRatio: '16 / 10',
+              position: 'relative',
+              background: 'url("/about%20cta.jpeg") center/cover no-repeat',
+              borderRadius: '2px',
+              boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+            }} />
+          </div>
+
         </div>
       </section>
     </div>
