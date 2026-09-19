@@ -15,7 +15,7 @@ export default function Home() {
         position: 'relative'
       }}>
         {/* Left Side: Content */}
-        <div className="hero-content-side" style={{ flex: 1, backgroundColor: '#080808', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 4rem' }}>
+        <div className="hero-content-side" style={{ flex: '0 0 38%', backgroundColor: '#080808', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 4rem' }}>
           <div style={{ maxWidth: '600px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2.5rem', paddingTop: '80px' }}>
             <div style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
               ABOVA — ABOVE ALL
@@ -44,13 +44,13 @@ export default function Home() {
 
         {/* Right Side: Image */}
         <div className="hero-image-side" style={{
-          flex: 1,
+          flex: '0 0 62%',
           position: 'relative',
           backgroundColor: '#0a0a0a',
           overflow: 'hidden'
         }}>
           <Image
-            src="/sample1.png"
+            src="/hero_extended.png"
             alt="Hero Background"
             fill
             style={{ objectFit: 'cover', objectPosition: 'center' }}
@@ -75,11 +75,13 @@ export default function Home() {
             .hero-content-side {
               padding: 6rem 2rem !important;
               order: 2;
+              flex: 1 1 auto !important;
             }
             .hero-image-side {
               order: 1;
               min-height: 60vh;
               width: 100%;
+              flex: 1 1 auto !important;
             }
             .scroll-indicator {
               display: none;
