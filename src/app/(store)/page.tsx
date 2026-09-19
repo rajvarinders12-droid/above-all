@@ -44,7 +44,7 @@ export default function Home() {
         {/* Right Side: Image */}
         <div className="hero-image-side" style={{
           flex: 1,
-          background: 'url(/sample.jpg) center/cover no-repeat',
+          background: 'url(/sample1.png) center/cover no-repeat',
           position: 'relative'
         }}>
           {/* Subtle gradient overlay to blend the harsh edge on the image side if needed */}
