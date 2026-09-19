@@ -58,13 +58,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Text Block beneath */}
-        <div style={{ textAlign: 'center', marginTop: '5rem', padding: '0 2rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 400, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
-            ABOVA ISN'T JUST A BRAND.
-          </h2>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.5rem, 4vw, 2.5rem)', fontWeight: 400, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0 }}>
-            IT'S A MENTALITY.
+        {/* Editorial Statement */}
+        <div style={{ textAlign: 'center', marginTop: '10rem', marginBottom: '4rem', padding: '0 2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 400, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.02em', margin: 0, lineHeight: 1.2 }}>
+            Abova isn't just a brand.<br />
+            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'rgba(255,255,255,0.6)' }}>It's a mentality.</span>
           </h2>
         </div>
 
@@ -85,13 +83,14 @@ export default function Home() {
       </section>
 
       {/* 3. Categories Grid */}
-      <section style={{ padding: '0 1rem 8rem', maxWidth: '1800px', margin: '0 auto', width: '100%' }}>
-        <div style={{ textAlign: 'center', marginBottom: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '0.75rem', letterSpacing: '0.25em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>Discover</span>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 5vw, 3rem)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0, lineHeight: 1.2 }}>
-            Shop By Collection
+      <section style={{ padding: '4rem 2rem 10rem', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem', marginBottom: '4rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: '1rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.15em', margin: 0 }}>
+            Curated Collections
           </h2>
-          <div style={{ width: '40px', height: '1px', background: 'rgba(255,255,255,0.3)' }} />
+          <span style={{ fontSize: '0.75rem', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase' }}>
+            Explore
+          </span>
         </div>
         <DynamicCategories />
       </section>
