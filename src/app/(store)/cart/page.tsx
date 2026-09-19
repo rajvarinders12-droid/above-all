@@ -11,81 +11,77 @@ import { db } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 
 export default function CartPage() {
-    const { items, updateQuantity, removeItem, getCartTotal, clearCart } = useCartStore();
+    const { items, updateQuantity, removeItem, getCartTotal } = useCartStore();
     const [mounted, setMounted] = useState(false);
-    const [isVerifying, setIsVerifying] = useState(false);
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
     const total = getCartTotal();
-    const router = useRouter();
 
-
-
-    if (!mounted) return <main style={{ minHeight: '100vh', background: 'var(--bg-color)' }}><Navbar /></main>;
+    if (!mounted) return <main style={{ minHeight: '100vh', background: '#000000' }}><Navbar /></main>;
 
     return (
-        <main style={{ minHeight: '100vh', background: 'var(--bg-color)', color: 'var(--text-primary)', paddingBottom: '6rem' }}>
+        <main style={{ minHeight: '100vh', background: '#000000', color: '#ffffff', paddingBottom: '8rem' }}>
             <Script src="https://checkout.razorpay.com/v1/checkout.js" />
             <Navbar />
 
-            <div style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '120px', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
-                <h1 style={{ fontSize: 'clamp(2rem, 4vw, 2.75rem)', fontWeight: 600, letterSpacing: '-0.02em', marginBottom: '3rem', fontFamily: 'var(--font-serif)' }}>
-                    Your Cart
-                </h1>
+            <div style={{ maxWidth: '1200px', margin: '0 auto', paddingTop: '150px', paddingLeft: '1.5rem', paddingRight: '1.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '3rem' }}>
+                    <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 400, letterSpacing: '0.05em', fontFamily: 'var(--font-serif)', margin: 0, textTransform: 'uppercase' }}>
+                        Cart
+                    </h1>
+                    <span style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.4)', alignSelf: 'flex-start', marginTop: '0.5rem' }}>[{items.length}]</span>
+                </div>
 
                 {items.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--text-secondary)' }}>
-                        <p style={{ fontSize: '1.25rem', marginBottom: '2rem' }}>Your shopping cart is empty.</p>
-                        <Link href="/" className="btn-primary" style={{ display: 'inline-flex', padding: '1rem 2rem', textDecoration: 'none', background: 'var(--text-primary)', color: 'var(--bg-color)', fontWeight: 600, letterSpacing: '0.1em', textTransform: 'uppercase' }}>
-                            Continue Shopping
+                    <div style={{ textAlign: 'center', padding: '6rem 0', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                        <p style={{ fontSize: '1.25rem', marginBottom: '2.5rem', color: 'rgba(255,255,255,0.5)', fontFamily: 'var(--font-serif)' }}>Your selection is empty.</p>
+                        <Link href="/products" style={{ display: 'inline-flex', padding: '1rem 3rem', textDecoration: 'none', background: '#ffffff', color: '#000000', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.15em', textTransform: 'uppercase', transition: 'all 0.3s' }} className="hover-opacity">
+                            Discover Pieces
                         </Link>
                     </div>
                 ) : (
-                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.5fr) minmax(0, 1fr)', gap: '4rem', alignItems: 'start' }}>
-
+                    <div className="cart-grid">
                         {/* Cart Items List */}
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '2rem' }}>
                             {items.map((item) => (
-                                <div key={item.cartItemId} style={{ display: 'flex', gap: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '2rem' }}>
-                                    <div style={{ width: '120px', height: '160px', background: 'var(--surface-color)', borderRadius: '4px', overflow: 'hidden' }}>
+                                <div key={item.cartItemId} className="cart-item-row">
+                                    <div style={{ width: '130px', aspectRatio: '3/4', background: '#111', overflow: 'hidden', position: 'relative' }}>
                                         <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                     </div>
 
                                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                                        <div>
-                                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                                <div>
-                                                    <h3 style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '0.25rem' }}>{item.name}</h3>
-                                                    {(item.colorName || item.size) && (
-                                                        <div style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '0.5rem' }}>
-                                                            {item.colorName && <span>Color: {item.colorName}</span>}
-                                                            {item.colorName && item.size && <span> | </span>}
-                                                            {item.size && <span>Size: {item.size}</span>}
-                                                        </div>
-                                                    )}
-                                                </div>
-                                                <div style={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                                                    ₹{((Number(item.price) || 0) * item.quantity).toLocaleString()}
-                                                </div>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                                            <div style={{ paddingRight: '1rem' }}>
+                                                <h3 style={{ fontSize: '1.2rem', fontWeight: 400, marginBottom: '0.5rem', fontFamily: 'var(--font-serif)' }}>{item.name}</h3>
+                                                {(item.colorName || item.size) && (
+                                                    <div style={{ color: 'rgba(255,255,255,0.5)', fontSize: '0.8rem', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+                                                        {item.colorName && <span>{item.colorName}</span>}
+                                                        {item.colorName && item.size && <span> / </span>}
+                                                        {item.size && <span>{item.size}</span>}
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div style={{ fontSize: '1.1rem', fontWeight: 400 }}>
+                                                ₹{((Number(item.price) || 0) * item.quantity).toLocaleString()}
                                             </div>
                                         </div>
 
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '4px' }}>
-                                                <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}>
-                                                    <Minus size={14} />
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '2rem' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid rgba(255,255,255,0.2)', width: 'fit-content' }}>
+                                                <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)} style={{ padding: '0.75rem', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex' }}>
+                                                    <Minus size={14} strokeWidth={1} />
                                                 </button>
-                                                <span style={{ width: '30px', textAlign: 'center', fontSize: '0.9rem' }}>{item.quantity}</span>
-                                                <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} style={{ padding: '0.5rem', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer' }}>
-                                                    <Plus size={14} />
+                                                <span style={{ width: '40px', textAlign: 'center', fontSize: '0.85rem' }}>{item.quantity}</span>
+                                                <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)} style={{ padding: '0.75rem', background: 'transparent', border: 'none', color: '#fff', cursor: 'pointer', display: 'flex' }}>
+                                                    <Plus size={14} strokeWidth={1} />
                                                 </button>
                                             </div>
 
-                                            <button onClick={() => removeItem(item.cartItemId)} style={{ background: 'transparent', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.85rem' }}>
-                                                <Trash2 size={16} /> Remove
+                                            <button onClick={() => removeItem(item.cartItemId)} className="hover-white" style={{ background: 'transparent', border: 'none', color: 'rgba(255,255,255,0.4)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'color 0.3s' }}>
+                                                Remove
                                             </button>
                                         </div>
                                     </div>
@@ -94,19 +90,19 @@ export default function CartPage() {
                         </div>
 
                         {/* Order Summary */}
-                        <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '2rem' }}>
-                            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>Order Summary</h3>
+                        <div className="cart-summary" style={{ background: 'linear-gradient(145deg, rgba(20,20,20,0.8) 0%, rgba(10,10,10,0.9) 100%)', border: '1px solid rgba(255,255,255,0.05)', padding: '2.5rem', position: 'sticky', top: '120px', backdropFilter: 'blur(10px)' }}>
+                            <h3 style={{ fontSize: '0.9rem', letterSpacing: '0.15em', fontWeight: 600, textTransform: 'uppercase', marginBottom: '2rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1rem' }}>Summary</h3>
 
-                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem', fontSize: '0.95rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem', marginBottom: '2.5rem', fontSize: '0.9rem' }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: 'var(--text-secondary)' }}>Subtotal</span>
+                                    <span style={{ color: 'rgba(255,255,255,0.6)' }}>Subtotal</span>
                                     <span>₹{(Number(total) || 0).toLocaleString()}</span>
                                 </div>
                                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                                    <span style={{ color: 'var(--text-secondary)' }}>Shipping</span>
-                                    <span>Calculated at checkout</span>
+                                    <span style={{ color: 'rgba(255,255,255,0.6)' }}>Shipping</span>
+                                    <span style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.4)' }}>Calculated next</span>
                                 </div>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', fontWeight: 600, fontSize: '1.25rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '1.5rem', borderTop: '1px solid rgba(255,255,255,0.1)', fontSize: '1.25rem', fontFamily: 'var(--font-serif)' }}>
                                     <span>Total</span>
                                     <span>₹{(Number(total) || 0).toLocaleString()}</span>
                                 </div>
@@ -114,27 +110,62 @@ export default function CartPage() {
 
                             <Link
                                 href="/checkout"
+                                className="hover-opacity"
                                 style={{
-                                    width: '100%', padding: '1.25rem', background: 'var(--text-primary)', color: 'var(--bg-color)',
-                                    border: 'none', borderRadius: '4px', fontSize: '0.95rem', fontWeight: 600, letterSpacing: '0.1em',
+                                    width: '100%', padding: '1.25rem', background: '#ffffff', color: '#000000',
+                                    border: 'none', fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.15em',
                                     textTransform: 'uppercase', textDecoration: 'none',
-                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem',
-                                    transition: 'background 0.2s'
+                                    display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem',
+                                    transition: 'opacity 0.3s'
                                 }}
                             >
-                                <Lock size={16} />
-                                Checkout Securely
+                                <Lock size={14} strokeWidth={2} />
+                                Secure Checkout
                             </Link>
-
-                            <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>
-                                <p>Secured by Razorpay.</p>
-                                <p>Use your test API keys in your environment variables to test.</p>
-                            </div>
                         </div>
-
                     </div>
                 )}
             </div>
+
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .cart-grid {
+                    display: grid;
+                    grid-template-columns: 1.8fr 1fr;
+                    gap: 6rem;
+                    align-items: start;
+                }
+                .cart-item-row {
+                    display: flex;
+                    gap: 2rem;
+                }
+                .hover-opacity:hover {
+                    opacity: 0.8 !important;
+                }
+                .hover-white:hover {
+                    color: #fff !important;
+                }
+                @media (max-width: 1024px) {
+                    .cart-grid {
+                        grid-template-columns: 1.2fr 1fr;
+                        gap: 3rem;
+                    }
+                }
+                @media (max-width: 768px) {
+                    .cart-grid {
+                        grid-template-columns: 1fr;
+                        gap: 4rem;
+                    }
+                    .cart-item-row {
+                        gap: 1.5rem;
+                    }
+                    .cart-summary {
+                        padding: 1.5rem !important;
+                        position: relative !important;
+                        top: 0 !important;
+                    }
+                }
+            `}} />
         </main>
     );
 }
