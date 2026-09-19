@@ -1,6 +1,7 @@
 import FeaturedProducts from '@/components/FeaturedProducts';
 import DynamicCategories from '@/components/DynamicCategories';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -44,11 +45,19 @@ export default function Home() {
         {/* Right Side: Image */}
         <div className="hero-image-side" style={{
           flex: 1,
-          background: 'url(/sample1.png) center/cover no-repeat',
-          position: 'relative'
+          position: 'relative',
+          backgroundColor: '#0a0a0a',
+          overflow: 'hidden'
         }}>
+          <Image
+            src="/sample1.png"
+            alt="Hero Background"
+            fill
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+            priority
+          />
           {/* Subtle gradient overlay to blend the harsh edge on the image side if needed */}
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to right, rgba(8,8,8,0.5) 0%, transparent 15%)' }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to right, rgba(8,8,8,0.7) 0%, transparent 15%)', zIndex: 5 }} />
         </div>
 
         {/* Scroll Indicator */}
