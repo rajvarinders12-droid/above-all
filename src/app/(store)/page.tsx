@@ -7,26 +7,81 @@ export default function Home() {
     <div style={{ background: '#000000', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
 
       {/* 1. Hero Section */}
-      <section style={{
-        height: '100vh',
-        position: 'relative',
-        background: 'url(/hero-img.PNG) center/cover no-repeat',
+      <section className="hero-section" style={{
+        minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        paddingBottom: '12vh'
+        width: '100%',
+        position: 'relative'
       }}>
-        {/* Dark over-gradient for readability - now darker at the top for navbar legibility */}
-        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to bottom, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 30%, rgba(0,0,0,0.8) 100%)' }} />
+        {/* Left Side: Content */}
+        <div className="hero-content-side" style={{ flex: 1, backgroundColor: '#080808', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 4rem' }}>
+          <div style={{ maxWidth: '600px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2.5rem', paddingTop: '80px' }}>
+            <div style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
+              ABOVA — ABOVE ALL
+            </div>
 
-        <div style={{ position: 'relative', zIndex: 10, textAlign: 'center', padding: '0 1rem' }}>
-          <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(3rem, 10vw, 5.5rem)', letterSpacing: '0.25em', margin: 0, fontWeight: 800, textTransform: 'uppercase', textShadow: '0 4px 24px rgba(0,0,0,0.5)' }}>ABOVE ALL</h1>
-          <p style={{ marginTop: '1.5rem', fontSize: 'clamp(0.7rem, 3vw, 0.9rem)', letterSpacing: '0.25em', textTransform: 'uppercase', opacity: 0.9, textShadow: '0 2px 12px rgba(0,0,0,0.8)' }}>Elevated essentials for the modern lifestyle.</p>
-          <Link href="/products" style={{ display: 'inline-block', marginTop: '3.5rem', padding: '1.25rem 3.5rem', background: '#ffffff', color: '#000000', textDecoration: 'none', fontSize: '0.8rem', letterSpacing: '0.15em', fontWeight: 700, transition: 'var(--transition-fast)' }}>
-            DISCOVER COLLECTION
-          </Link>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(3.5rem, 6vw, 6.5rem)', fontWeight: 400, fontStyle: 'italic', margin: 0, lineHeight: 1.1, color: '#f5f5f5' }}>
+              Elevated<br />
+              Essentials.
+            </h1>
+
+            <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '1.1rem', lineHeight: 1.6, maxWidth: '450px', margin: 0, fontWeight: 300 }}>
+              For every version of you. Timeless pieces engineered from premium fabric, designed to stand above the noise.
+            </p>
+
+            <Link href="/products" className="hero-btn" style={{
+              display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between',
+              background: '#ffffff', color: '#000000', textDecoration: 'none',
+              fontSize: '0.75rem', letterSpacing: '0.15em', fontWeight: 700,
+              padding: '1.25rem 2.5rem', width: 'fit-content',
+              textTransform: 'uppercase', transition: 'all 0.3s ease', marginTop: '1rem'
+            }}>
+              DISCOVER COLLECTION <span style={{ marginLeft: '1.5rem', fontSize: '1.2rem', fontWeight: 300 }}>→</span>
+            </Link>
+          </div>
         </div>
+
+        {/* Right Side: Image */}
+        <div className="hero-image-side" style={{
+          flex: 1,
+          background: 'url(/sample.jpg) center/cover no-repeat',
+          position: 'relative'
+        }}>
+          {/* Subtle gradient overlay to blend the harsh edge on the image side if needed */}
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'linear-gradient(to right, rgba(8,8,8,0.5) 0%, transparent 15%)' }} />
+        </div>
+
+        {/* Scroll Indicator */}
+        <div className="scroll-indicator" style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', fontSize: '0.65rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.4)', zIndex: 20 }}>
+          SCROLL
+        </div>
+
+        {/* Local CSS for Hero */}
+        <style dangerouslySetInnerHTML={{
+          __html: `
+          @media (max-width: 900px) {
+            .hero-section {
+              flex-direction: column !important;
+            }
+            .hero-content-side {
+              padding: 6rem 2rem !important;
+              order: 2;
+            }
+            .hero-image-side {
+              order: 1;
+              min-height: 60vh;
+              width: 100%;
+            }
+            .scroll-indicator {
+              display: none;
+            }
+          }
+          .hero-btn:hover {
+            background: #e0e0e0 !important;
+            transform: translateX(5px);
+          }
+          `
+        }} />
       </section>
 
       {/* 2. Infinite Marquee Image Gallery */}
