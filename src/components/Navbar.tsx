@@ -116,7 +116,7 @@ export default function Navbar() {
                 top: 0,
                 width: '100%',
                 zIndex: 50,
-                padding: '1.25rem 2rem',
+                padding: '1.25rem clamp(1rem, 4vw, 2rem)',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -128,7 +128,7 @@ export default function Navbar() {
                 {/* Menu Toggle */}
                 <div
                     onClick={() => setMenuOpen(!menuOpen)}
-                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.75rem', letterSpacing: '0.15em', fontWeight: 400, cursor: 'pointer', zIndex: 60, width: '120px' }}
+                    style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontSize: '0.75rem', letterSpacing: '0.15em', fontWeight: 400, cursor: 'pointer', zIndex: 60 }}
                 >
                     <div style={{ position: 'relative', width: '22px', height: '22px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <X size={22} strokeWidth={1} style={{ position: 'absolute', opacity: menuOpen ? 1 : 0, transform: menuOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'all 0.5s cubic-bezier(0.85, 0, 0.15, 1)' }} />
@@ -152,7 +152,7 @@ export default function Navbar() {
                 </div>
 
                 {/* Actions */}
-                <div style={{ display: 'flex', gap: '2rem', fontSize: '0.7rem', letterSpacing: '0.15em', fontWeight: 400, textTransform: 'uppercase', zIndex: 60, justifyContent: 'flex-end', minWidth: '300px' }}>
+                <div style={{ display: 'flex', gap: 'clamp(1rem, 3vw, 2rem)', fontSize: '0.7rem', letterSpacing: '0.15em', fontWeight: 400, textTransform: 'uppercase', zIndex: 60, justifyContent: 'flex-end', flex: 1, minWidth: 0 }}>
                     <span onClick={() => setSearchOpen(true)} style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }} className="nav-hidden-mobile menu-link-hover">
                         Search
                     </span>
