@@ -61,11 +61,11 @@ export default function CartPage() {
 
                                         {/* Product Details */}
                                         <div className="cart-product-col" style={{ display: 'flex', gap: '2rem' }}>
-                                            <Link href={`/product/${item.id}`} style={{ width: '120px', flexShrink: 0, aspectRatio: '3/4', background: '#111', position: 'relative' }}>
+                                            <Link href={`/product/${item.productId}`} style={{ width: '120px', flexShrink: 0, aspectRatio: '3/4', background: '#111', position: 'relative' }}>
                                                 <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                                             </Link>
                                             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: '0.5rem' }}>
-                                                <Link href={`/product/${item.id}`} style={{ textDecoration: 'none', color: '#fff', fontSize: '1rem', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
+                                                <Link href={`/product/${item.productId}`} style={{ textDecoration: 'none', color: '#fff', fontSize: '1rem', fontWeight: 500, letterSpacing: '0.05em', textTransform: 'uppercase' }}>
                                                     {item.name}
                                                 </Link>
                                                 <div style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.25rem', display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
@@ -147,72 +147,72 @@ export default function CartPage() {
             </div>
 
             <style dangerouslySetInnerHTML={{
-                __html: \`
-            .cart-grid {
-                display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 6rem;
-            align-items: start;
+                __html: `
+                .cart-grid {
+                    display: grid;
+                    grid-template-columns: 2fr 1fr;
+                    gap: 6rem;
+                    align-items: start;
                 }
-            .hover-white:hover {
-                color: #fff !important;
+                .hover-white:hover {
+                    color: #fff !important;
                 }
-            .btn-outline-premium:hover {
-                background: #fff !important;
-            color: #000 !important;
+                .btn-outline-premium:hover {
+                    background: #fff !important;
+                    color: #000 !important;
                 }
-            .btn-primary-solid:hover {
-                background: transparent !important;
-            color: #fff !important;
+                .btn-primary-solid:hover {
+                    background: transparent !important;
+                    color: #fff !important;
                 }
-
-            @media (max-width: 1024px) {
-                    .cart - grid {
-                grid - template - columns: 1.5fr 1fr;
-            gap: 3rem;
+                
+                @media (max-width: 1024px) {
+                    .cart-grid {
+                        grid-template-columns: 1.5fr 1fr;
+                        gap: 3rem;
                     }
                 }
-
-            @media (max-width: 768px) {
-                    .cart - grid {
-                grid - template - columns: 1fr;
-            gap: 4rem;
+                
+                @media (max-width: 768px) {
+                    .cart-grid {
+                        grid-template-columns: 1fr;
+                        gap: 4rem;
                     }
-            .cart-header {
-                display: none !important;
+                    .cart-header {
+                        display: none !important;
                     }
-            .cart-item-row {
-                grid - template - columns: 1fr !important;
-            position: relative;
-            gap: 1.5rem !important;
-            padding-bottom: 2rem;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+                    .cart-item-row {
+                        grid-template-columns: 1fr !important;
+                        position: relative;
+                        gap: 1.5rem !important;
+                        padding-bottom: 2rem;
+                        border-bottom: 1px solid rgba(255,255,255,0.05);
                     }
-            .cart-product-col {
-                gap: 1.25rem !important;
+                    .cart-product-col {
+                        gap: 1.25rem !important;
                     }
-            .cart-product-col img {
-                width: 100px !important;
+                    .cart-product-col img {
+                        width: 100px !important;
                     }
-            .cart-qty-wrapper {
-                justify - content: flex-start !important;
-            margin-top: 1rem;
+                    .cart-qty-wrapper {
+                        justify-content: flex-start !important;
+                        margin-top: 1rem;
                     }
-            .cart-price-wrapper {
-                position: absolute;
-            bottom: 2rem;
-            right: 0;
-            text-align: right;
+                    .cart-price-wrapper {
+                        position: absolute;
+                        bottom: 2rem;
+                        right: 0;
+                        text-align: right;
                     }
-            .cart-summary {
-                position: relative !important;
-            top: 0 !important;
+                    .cart-summary {
+                        position: relative !important;
+                        top: 0 !important;
                     }
                     .cart-summary > div {
-                padding: 1.5rem !important;
+                        padding: 1.5rem !important;
                     }
                 }
-            \`}} />
+            `}} />
         </main>
     );
 }
