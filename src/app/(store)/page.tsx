@@ -86,9 +86,9 @@ export default function Home() {
 
       {/* 3. Categories Grid */}
       <section style={{ padding: '0 1rem 8rem', maxWidth: '1800px', margin: '0 auto', width: '100%' }}>
-        <div style={{ textAlign: 'center', marginBottom: '4rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-          <span style={{ fontSize: '0.8rem', letterSpacing: '0.25em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>Discover</span>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.1em', margin: 0 }}>
+        <div style={{ textAlign: 'center', marginBottom: '3rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
+          <span style={{ fontSize: '0.75rem', letterSpacing: '0.25em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>Discover</span>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.8rem, 5vw, 3rem)', fontWeight: 400, textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0, lineHeight: 1.2 }}>
             Shop By Collection
           </h2>
           <div style={{ width: '40px', height: '1px', background: 'rgba(255,255,255,0.3)' }} />
@@ -124,11 +124,11 @@ export default function Home() {
       {/* 5. The Collection (Dynamic Products) */}
       <section style={{ padding: '10rem 2rem', background: '#000000' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '5rem' }}>
-            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '3.5rem', fontWeight: 400 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '4rem', gap: '2rem' }}>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 6vw, 3.5rem)', fontWeight: 400, margin: 0, lineHeight: 1.1 }}>
               The Collection
             </h2>
-            <Link href="/products" style={{ textDecoration: 'none', background: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '1rem 3rem', fontSize: '0.75rem', letterSpacing: '0.1em', transition: 'var(--transition-fast)' }}>
+            <Link href="/products" style={{ textDecoration: 'none', background: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '0.8rem 2rem', fontSize: '0.75rem', letterSpacing: '0.1em', transition: 'var(--transition-fast)' }}>
               VIEW ALL
             </Link>
           </div>
