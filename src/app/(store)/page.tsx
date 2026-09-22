@@ -15,13 +15,13 @@ export default function Home() {
         position: 'relative'
       }}>
         {/* Left Side: Content */}
-        <div className="hero-content-side" style={{ flex: '0 0 38%', backgroundColor: '#080808', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 4rem' }}>
+        <div className="hero-content-side" style={{ flex: '1 1 50%', minWidth: 0, backgroundColor: '#080808', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 4rem' }}>
           <div style={{ maxWidth: '600px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2.5rem', paddingTop: '80px' }}>
             <div style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
               ABOVA — ABOVE ALL
             </div>
 
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(3.5rem, 6vw, 6.5rem)', fontWeight: 400, margin: 0, lineHeight: 1.1, color: '#f5f5f5' }}>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2.5rem, 4vw, 5rem)', fontWeight: 400, margin: 0, lineHeight: 1.1, color: '#f5f5f5' }}>
               Elevated<br />
               Essentials.
             </h1>
@@ -44,7 +44,8 @@ export default function Home() {
 
         {/* Right Side: Image */}
         <div className="hero-image-side" style={{
-          flex: '0 0 62%',
+          flex: '1 1 50%',
+          minWidth: 0,
           position: 'relative',
           backgroundColor: '#0a0a0a',
           overflow: 'hidden'
