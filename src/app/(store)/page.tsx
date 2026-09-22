@@ -21,7 +21,7 @@ export default function Home() {
               ABOVA — ABOVE ALL
             </div>
 
-            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(3.5rem, 6vw, 6.5rem)', fontWeight: 400, fontStyle: 'italic', margin: 0, lineHeight: 1.1, color: '#f5f5f5' }}>
+            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(3.5rem, 6vw, 6.5rem)', fontWeight: 400, margin: 0, lineHeight: 1.1, color: '#f5f5f5' }}>
               Elevated<br />
               Essentials.
             </h1>
@@ -50,10 +50,11 @@ export default function Home() {
           overflow: 'hidden'
         }}>
           <Image
-            src="/hero_extended.png"
+            src="/sample.jpg"
             alt="Hero Background"
             fill
             style={{ objectFit: 'cover', objectPosition: 'center' }}
+            quality={100}
             priority
           />
           {/* Subtle gradient overlay to blend the harsh edge on the image side if needed */}
