@@ -127,10 +127,10 @@ export default function Home() {
         </div>
 
         {/* Editorial Statement */}
-        <div style={{ textAlign: 'center', marginTop: '10rem', marginBottom: '4rem', padding: '0 2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(2rem, 5vw, 4rem)', fontWeight: 400, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.02em', margin: 0, lineHeight: 1.2 }}>
+        <div style={{ textAlign: 'center', marginTop: '8rem', marginBottom: '4rem', padding: '0 2rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: 'clamp(1.25rem, 2.5vw, 2.25rem)', fontWeight: 500, color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.05em', margin: 0, lineHeight: 1.4 }}>
             Abova isn't just a brand.<br />
-            <span style={{ fontStyle: 'italic', fontWeight: 300, color: 'rgba(255,255,255,0.6)' }}>It's a mentality.</span>
+            <span style={{ fontWeight: 400, color: '#a1a1aa' }}>It's a mentality.</span>
           </h2>
         </div>
 
