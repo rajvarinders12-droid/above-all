@@ -33,11 +33,11 @@ export default function Home() {
             <Link href="/products" className="hero-btn" style={{
               display: 'inline-flex', alignItems: 'center', justifyContent: 'space-between',
               background: '#ffffff', color: '#000000', textDecoration: 'none',
-              fontSize: '0.75rem', letterSpacing: '0.15em', fontWeight: 700,
-              padding: '1.25rem 2.5rem', width: 'fit-content',
-              textTransform: 'uppercase', transition: 'all 0.3s ease', marginTop: '1rem'
+              fontSize: '0.7rem', letterSpacing: '0.15em', fontWeight: 600,
+              padding: '0.85rem 1.75rem', width: 'fit-content',
+              textTransform: 'uppercase', transition: 'all 0.3s ease', marginTop: '1.5rem'
             }}>
-              DISCOVER COLLECTION <span style={{ marginLeft: '1.5rem', fontSize: '1.2rem', fontWeight: 300 }}>→</span>
+              DISCOVER COLLECTION <span style={{ marginLeft: '1rem', fontSize: '1.1rem', fontWeight: 400 }}>→</span>
             </Link>
           </div>
         </div>
