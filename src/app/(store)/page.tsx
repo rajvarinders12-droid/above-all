@@ -167,8 +167,8 @@ export default function Home() {
           <h2 style={{ fontFamily: 'var(--font-sans)', fontSize: '1rem', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.15em', margin: 0 }}>
             Abova Collection
           </h2>
-          <Link href="/collections" style={{ fontSize: '0.75rem', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', textDecoration: 'none' }}>
-            Explore
+          <Link href="/collections" style={{ fontSize: '0.75rem', letterSpacing: '0.15em', color: 'rgba(255,255,255,0.8)', textTransform: 'uppercase', textDecoration: 'none', borderBottom: '1px solid rgba(255,255,255,0.4)', paddingBottom: '4px' }}>
+            Explore All
           </Link>
         </div>
         <DynamicCategories />
