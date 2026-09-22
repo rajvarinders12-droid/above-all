@@ -3,7 +3,7 @@
 import { useEffect, useState, use } from 'react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { ChevronRight, Check } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { useCartStore } from '@/store/cartStore';
@@ -41,6 +41,13 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const [selectedColor, setSelectedColor] = useState<Variant | null>(null);
     const [selectedSize, setSelectedSize] = useState<string>('');
     const [added, setAdded] = useState(false);
+    const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+    const [lightboxIndex, setLightboxIndex] = useState(0);
+
+    const allImages = product ? Array.from(new Set([
+        product.mainImageUrl,
+        ...(product.variants?.map((v: Variant) => v.imageUrl) || [])
+    ].filter(Boolean))) : [];
 
     // Fallback for cartStore
     const addItem = useCartStore(state => (state as any).addItem || (() => { }));
@@ -266,33 +273,46 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 }
 
                 .size-selector {
-                    display: grid;
-                    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
-                    gap: 0.75rem;
+                    display: flex;
+                    flex-wrap: wrap;
+                    gap: 1.5rem;
                     margin-bottom: 3rem;
                 }
 
                 .size-btn {
-                    padding: 1rem 0;
+                    padding: 0.25rem 0.5rem;
                     background: transparent;
-                    border: 1px solid rgba(255, 255, 255, 0.15);
-                    color: var(--text-primary);
-                    font-size: 0.9rem;
+                    border: none;
+                    color: var(--text-secondary);
+                    font-size: 1rem;
                     cursor: pointer;
-                    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                    text-align: center;
+                    transition: all 0.3s ease;
+                    position: relative;
+                }
+
+                .size-btn::after {
+                    content: '';
+                    position: absolute;
+                    bottom: -2px;
+                    left: 50%;
+                    width: 100%;
+                    height: 1px;
+                    background: var(--text-primary);
+                    transform: translateX(-50%) scaleX(0);
+                    transition: transform 0.3s ease;
                 }
 
                 .size-btn:hover {
-                    border-color: rgba(255, 255, 255, 0.5);
-                    background: rgba(255, 255, 255, 0.02);
+                    color: var(--text-primary);
                 }
 
                 .size-btn.active {
-                    background: var(--text-primary);
-                    color: var(--bg-color);
-                    border-color: var(--text-primary);
+                    color: var(--text-primary);
                     font-weight: 600;
+                }
+
+                .size-btn.active::after {
+                    transform: translateX(-50%) scaleX(1);
                 }
 
                 .action-buttons {
@@ -427,8 +447,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 `}} />
 
             <div className="premium-product-layout">
-                {/* Immersive Image Section */}
-                <div className="image-section">
+                {/* Immersive Image Section with Lightbox toggle */}
+                <div className="image-section" style={{ cursor: 'zoom-in' }} onClick={() => {
+                    const idx = allImages.indexOf(activeImage || product.mainImageUrl);
+                    setLightboxIndex(idx >= 0 ? idx : 0);
+                    setIsLightboxOpen(true);
+                }}>
                     <img
                         key={activeImage} // Force re-render for animation on change
                         src={activeImage || product.mainImageUrl}
@@ -560,6 +584,58 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     </div>
                 </div>
             </div>
+
+            {/* Lightbox Overlay */}
+            {isLightboxOpen && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                    background: 'rgba(0,0,0,0.95)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyItems: 'center', justifyContent: 'center'
+                }}>
+                    <button
+                        onClick={() => setIsLightboxOpen(false)}
+                        style={{ position: 'absolute', top: '2rem', right: '2rem', background: 'none', border: 'none', color: '#fff', fontSize: '3rem', cursor: 'pointer', zIndex: 10000, fontWeight: 300, lineHeight: 1 }}
+                    >×</button>
+
+                    {allImages.length > 1 && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setLightboxIndex(prev => (prev === 0 ? allImages.length - 1 : prev - 1));
+                            }}
+                            style={{ position: 'absolute', left: '2%', background: 'none', border: 'none', color: '#fff', padding: '1rem', cursor: 'pointer', zIndex: 10000 }}
+                        >
+                            <ChevronLeft size={48} strokeWidth={1} />
+                        </button>
+                    )}
+
+                    <img
+                        src={allImages[lightboxIndex]}
+                        alt="Product View"
+                        style={{ maxWidth: '100%', maxHeight: '100vh', objectFit: 'contain', animation: 'fadeIn 0.3s ease' }}
+                    />
+
+                    {allImages.length > 1 && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setLightboxIndex(prev => (prev === allImages.length - 1 ? 0 : prev + 1));
+                            }}
+                            style={{ position: 'absolute', right: '2%', background: 'none', border: 'none', color: '#fff', padding: '1rem', cursor: 'pointer', zIndex: 10000 }}
+                        >
+                            <ChevronRight size={48} strokeWidth={1} />
+                        </button>
+                    )}
+
+                    <div style={{ position: 'absolute', bottom: '2rem', display: 'flex', gap: '0.75rem', zIndex: 10000, width: '100%', justifyContent: 'center' }}>
+                        {allImages.map((_, i) => (
+                            <div key={i} onClick={(e) => {
+                                e.stopPropagation();
+                                setLightboxIndex(i);
+                            }} style={{ width: '8px', height: '8px', borderRadius: '50%', background: i === lightboxIndex ? '#fff' : 'rgba(255,255,255,0.3)', cursor: 'pointer', transition: 'background 0.3s' }} />
+                        ))}
+                    </div>
+                </div>
+            )}
         </main>
     );
 }
