@@ -17,7 +17,7 @@ export default function Home() {
         {/* Left Side: Content */}
         <div className="hero-content-side" style={{ flex: '1 1 50%', minWidth: 0, backgroundColor: '#080808', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '0 4rem' }}>
           <div style={{ maxWidth: '600px', width: '100%', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '2.5rem', paddingTop: '80px' }}>
-            <div style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
+            <div className="hero-eyebrow" style={{ fontSize: '0.75rem', letterSpacing: '0.2em', color: 'rgba(255,255,255,0.6)', textTransform: 'uppercase' }}>
               ABOVA — ABOVE ALL
             </div>
 
@@ -73,17 +73,28 @@ export default function Home() {
           @media (max-width: 900px) {
             .hero-section {
               flex-direction: column !important;
+              height: 100vh !important;
+              min-height: 100vh !important;
+              overflow: hidden;
             }
             .hero-content-side {
-              padding: 6rem 2rem !important;
+              padding: 2rem 2rem !important;
               order: 2;
-              flex: 1 1 auto !important;
+              flex: 1 1 50% !important;
+            }
+            .hero-content-side > div {
+              padding-top: 0 !important;
+              gap: 1.5rem !important;
+            }
+            .hero-eyebrow {
+              display: none !important;
             }
             .hero-image-side {
               order: 1;
-              min-height: 60vh;
+              min-height: unset !important;
+              height: 50% !important;
+              flex: 1 1 50% !important;
               width: 100%;
-              flex: 1 1 auto !important;
             }
             .scroll-indicator {
               display: none;
