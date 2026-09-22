@@ -143,13 +143,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 .premium-product-layout {
                     display: grid;
                     grid-template-columns: 1fr 1fr;
-                    min-height: calc(100vh - 120px);
+                    grid-template-rows: auto 1fr;
+                    min-height: 100vh;
+                    padding-top: 80px;
                 }
                 
                 .image-section {
                     position: sticky;
-                    top: 120px;
-                    height: calc(100vh - 120px);
+                    top: 80px;
+                    height: calc(100vh - 80px);
                     background: #111;
                     display: flex;
                     align-items: center;
@@ -178,6 +180,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     background: var(--bg-color); /* pure dark background */
                 }
 
+                .breadcrumb-container {
+                    grid-column: 1 / -1;
+                    padding: 1.5rem 5% 1rem 5%;
+                    background: var(--bg-color);
+                    display: flex;
+                    width: 100%;
+                }
+
                 .breadcrumb {
                     display: flex;
                     align-items: center;
@@ -186,11 +196,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     text-transform: uppercase;
                     letter-spacing: 0.1em;
                     color: var(--text-tertiary);
-                    padding: 2rem 5% 0 5%;
+                    opacity: 0.8;
                     width: 100%;
                     max-width: 1440px;
                     margin: 0 auto;
-                    opacity: 0.8;
                 }
 
                 .breadcrumb a {
@@ -426,18 +435,21 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                 @media (max-width: 768px) {
                     .premium-product-layout {
-                        grid-template-columns: 1fr;
-                        padding-top: 60px;
-                        display: block;
+                        display: flex;
+                        flex-direction: column;
+                        padding-top: 70px;
+                    }
+                    .breadcrumb-container {
+                        padding: 1rem 1.5rem;
                     }
                     .image-section {
                         position: relative;
                         top: 0;
-                        height: 70vh;
+                        height: 60vh;
                         width: 100%;
                     }
                     .details-section {
-                        padding: 3rem 1.5rem;
+                        padding: 2.5rem 1.5rem;
                     }
                     .product-title {
                         font-size: 2.25rem;
@@ -448,23 +460,24 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 }
                 `}} />
 
-            <div style={{ paddingTop: '80px', background: 'var(--bg-color)' }}>
-                <div className="breadcrumb">
-                    <Link href="/">Home</Link>
-                    {product.category && (
-                        <>
-                            <ChevronRight size={12} />
-                            <Link href={`/category/${product.category.toLowerCase().replace(/\\s+/g, '-')}`}>
-                                {product.category}
-                            </Link>
-                        </>
-                    )}
-                    <ChevronRight size={12} />
-                    <span style={{ color: 'var(--text-primary)' }}>{product.name}</span>
-                </div>
-            </div>
-
             <div className="premium-product-layout">
+                {/* Breadcrumb full width top bar */}
+                <div className="breadcrumb-container">
+                    <div className="breadcrumb">
+                        <Link href="/">Home</Link>
+                        {product.category && (
+                            <>
+                                <ChevronRight size={12} />
+                                <Link href={`/category/${product.category.toLowerCase().replace(/\\s+/g, '-')}`}>
+                                    {product.category}
+                                </Link>
+                            </>
+                        )}
+                        <ChevronRight size={12} />
+                        <span style={{ color: 'var(--text-primary)' }}>{product.name}</span>
+                    </div>
+                </div>
+
                 {/* Immersive Image Section with Lightbox toggle */}
                 <div className="image-section" style={{ cursor: 'zoom-in' }} onClick={() => {
                     const idx = allImages.indexOf(activeImage || product.mainImageUrl);
