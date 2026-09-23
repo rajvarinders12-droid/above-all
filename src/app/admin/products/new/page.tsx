@@ -220,133 +220,6 @@ export default function AddProductPage() {
 
       <form style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
 
-        {/* SECTION: Basic Info */}
-        <div className="clean-panel" style={{ padding: '2rem' }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '1.5rem' }}>General Information</h2>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-            <div>
-              <label className="label-clean">Product Name *</label>
-              <input type="text" placeholder="e.g. Classic White T-Shirt" required value={name} onChange={e => setName(e.target.value)} className="input-clean" />
-            </div>
-            <div>
-              <label className="label-clean">Category *</label>
-              <input
-                type="text"
-                list="category-suggestions"
-                placeholder="Select existing or type a new category"
-                required
-                value={category}
-                onChange={e => setCategory(e.target.value)}
-                className="input-clean"
-              />
-              <datalist id="category-suggestions">
-                {existingCategories.map((cat, i) => (
-                  <option key={i} value={cat} />
-                ))}
-              </datalist>
-            </div>
-            <div>
-              <label className="label-clean">Description *</label>
-              <textarea placeholder="Describe the product..." required rows={4} value={description} onChange={e => setDescription(e.target.value)} className="input-clean" style={{ resize: 'vertical' }} />
-            </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '0.5rem' }}>
-              <input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} className="toggle-checkbox" />
-              <div>
-                <div style={{ fontWeight: 500, fontSize: '0.95rem' }}>Feature on Home Page</div>
-                <div style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>Highlight this product in the featured section.</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* SECTION: Media */}
-        <div className="clean-panel" style={{ padding: '2rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
-            <h2 style={{ fontSize: '1.1rem', fontWeight: 500 }}>Media</h2>
-            <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>Tip: Use .WEBP format for faster loading</span>
-          </div>
-
-          <div className="admin-grid">
-            {/* Main Image */}
-            <div>
-              <label className="label-clean">Main Image *</label>
-              <label className="upload-zone" style={mainImageUrl ? { backgroundImage: `url('${mainImageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
-                {!mainImageUrl && (
-                  <>
-                    <UploadCloud size={32} color="var(--text-secondary)" style={{ marginBottom: '1rem' }} />
-                    <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Upload Image</span>
-                  </>
-                )}
-                <input type="file" accept="image/*" onChange={uploadMainImage} style={{ display: 'none' }} />
-                {mainImageUrl && <div className="upload-overlay">Replace Image</div>}
-              </label>
-            </div>
-
-            {/* Size Chart */}
-            <div>
-              <label className="label-clean">Size Guide (Optional)</label>
-              <label className="upload-zone" style={sizeChartUrl ? { backgroundImage: `url('${sizeChartUrl}')`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
-                {!sizeChartUrl && (
-                  <>
-                    <UploadCloud size={32} color="var(--text-tertiary)" style={{ marginBottom: '1rem' }} />
-                    <span style={{ color: 'var(--text-tertiary)', fontSize: '0.9rem' }}>Upload Size Chart</span>
-                  </>
-                )}
-                <input type="file" accept="image/*" onChange={uploadSizeChart} style={{ display: 'none' }} />
-                {sizeChartUrl && <div className="upload-overlay">Replace Size Chart</div>}
-              </label>
-            </div>
-
-            {/* Gallery Images */}
-            <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
-              <label className="label-clean">Additional Gallery Images</label>
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                {galleryImages.map((img, index) => (
-                  <div key={index} style={{ width: '100px', height: '100px', borderRadius: '6px', background: `url('${img}') center/cover no-repeat`, position: 'relative' }}>
-                    <button type="button" onClick={() => removeGalleryImage(index)} style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: '2px solid var(--bg-color)' }}>
-                      <Trash2 size={12} />
-                    </button>
-                  </div>
-                ))}
-
-                <label className="upload-zone" style={{ width: '100px', height: '100px', minHeight: '100px', padding: 0 }}>
-                  <Plus size={24} color="var(--text-tertiary)" />
-                  <input type="file" accept="image/*" onChange={uploadGalleryImage} style={{ display: 'none' }} />
-                </label>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* SECTION: Pricing & Inventory */}
-        <div className="clean-panel" style={{ padding: '2rem' }}>
-          <h2 style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '1.5rem' }}>Pricing & Inventory</h2>
-
-          <div className="admin-grid">
-            <div>
-              <label className="label-clean">Price (₹) *</label>
-              <input type="number" step="0.01" required value={actualPrice} onChange={e => setActualPrice(e.target.value)} className="input-clean" placeholder="0.00" />
-            </div>
-
-            <div style={{ position: 'relative' }}>
-              <label className="label-clean">Compare at Price (₹)</label>
-              <input type="number" step="0.01" value={discountedPrice} onChange={e => setDiscountedPrice(e.target.value)} className="input-clean" placeholder="Optional discount" />
-              {discountPercent > 0 && (
-                <div style={{ position: 'absolute', right: '12px', top: '38px', color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 500 }}>
-                  {discountPercent}% OFF
-                </div>
-              )}
-            </div>
-
-            <div>
-              <label className="label-clean">Inventory (Units) *</label>
-              <input type="number" required value={inStock} onChange={e => setInStock(e.target.value)} className="input-clean" />
-            </div>
-          </div>
-        </div>
-
         {/* SECTION: Product Type (Variants) */}
         <div className="clean-panel" style={{ padding: '3rem 2rem' }}>
           <h2 style={{ fontSize: '1.5rem', fontWeight: 600, textAlign: 'center', marginBottom: '0.5rem' }}>Does this product have variants?</h2>
@@ -379,6 +252,134 @@ export default function AddProductPage() {
 
         {hasVariants !== 'unselected' && (
           <>
+            {/* SECTION: Basic Info */}
+            <div className="clean-panel" style={{ padding: '2rem' }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '1.5rem' }}>General Information</h2>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                <div>
+                  <label className="label-clean">Product Name *</label>
+                  <input type="text" placeholder="e.g. Classic White T-Shirt" required value={name} onChange={e => setName(e.target.value)} className="input-clean" />
+                </div>
+                <div>
+                  <label className="label-clean">Category *</label>
+                  <input
+                    type="text"
+                    list="category-suggestions"
+                    placeholder="Select existing or type a new category"
+                    required
+                    value={category}
+                    onChange={e => setCategory(e.target.value)}
+                    className="input-clean"
+                  />
+                  <datalist id="category-suggestions">
+                    {existingCategories.map((cat, i) => (
+                      <option key={i} value={cat} />
+                    ))}
+                  </datalist>
+                </div>
+                <div>
+                  <label className="label-clean">Description *</label>
+                  <textarea placeholder="Describe the product..." required rows={4} value={description} onChange={e => setDescription(e.target.value)} className="input-clean" style={{ resize: 'vertical' }} />
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', paddingTop: '0.5rem' }}>
+                  <input type="checkbox" checked={featured} onChange={e => setFeatured(e.target.checked)} className="toggle-checkbox" />
+                  <div>
+                    <div style={{ fontWeight: 500, fontSize: '0.95rem' }}>Feature on Home Page</div>
+                    <div style={{ color: 'var(--text-tertiary)', fontSize: '0.85rem' }}>Highlight this product in the featured section.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION: Media */}
+            <div className="clean-panel" style={{ padding: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                <h2 style={{ fontSize: '1.1rem', fontWeight: 500 }}>Media</h2>
+                <span style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)' }}>Tip: Use .WEBP format for faster loading</span>
+              </div>
+
+              <div className="admin-grid">
+                {/* Main Image */}
+                <div>
+                  <label className="label-clean">Main Image *</label>
+                  <label className="upload-zone" style={mainImageUrl ? { backgroundImage: `url('${mainImageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
+                    {!mainImageUrl && (
+                      <>
+                        <UploadCloud size={32} color="var(--text-secondary)" style={{ marginBottom: '1rem' }} />
+                        <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Upload Image</span>
+                      </>
+                    )}
+                    <input type="file" accept="image/*" onChange={uploadMainImage} style={{ display: 'none' }} />
+                    {mainImageUrl && <div className="upload-overlay">Replace Image</div>}
+                  </label>
+                </div>
+
+                {/* Size Chart */}
+                <div>
+                  <label className="label-clean">Size Guide (Optional)</label>
+                  <label className="upload-zone" style={sizeChartUrl ? { backgroundImage: `url('${sizeChartUrl}')`, backgroundSize: 'contain', backgroundPosition: 'center', backgroundRepeat: 'no-repeat' } : {}}>
+                    {!sizeChartUrl && (
+                      <>
+                        <UploadCloud size={32} color="var(--text-tertiary)" style={{ marginBottom: '1rem' }} />
+                        <span style={{ color: 'var(--text-tertiary)', fontSize: '0.9rem' }}>Upload Size Chart</span>
+                      </>
+                    )}
+                    <input type="file" accept="image/*" onChange={uploadSizeChart} style={{ display: 'none' }} />
+                    {sizeChartUrl && <div className="upload-overlay">Replace Size Chart</div>}
+                  </label>
+                </div>
+
+                {/* Gallery Images */}
+                <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
+                  <label className="label-clean">Additional Gallery Images</label>
+                  <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                    {galleryImages.map((img, index) => (
+                      <div key={index} style={{ width: '100px', height: '100px', borderRadius: '6px', background: `url('${img}') center/cover no-repeat`, position: 'relative' }}>
+                        <button type="button" onClick={() => removeGalleryImage(index)} style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: '2px solid var(--bg-color)' }}>
+                          <Trash2 size={12} />
+                        </button>
+                      </div>
+                    ))}
+
+                    <label className="upload-zone" style={{ width: '100px', height: '100px', minHeight: '100px', padding: 0 }}>
+                      <Plus size={24} color="var(--text-tertiary)" />
+                      <input type="file" accept="image/*" onChange={uploadGalleryImage} style={{ display: 'none' }} />
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION: Pricing & Inventory */}
+            <div className="clean-panel" style={{ padding: '2rem' }}>
+              <h2 style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '1.5rem' }}>Pricing & Inventory</h2>
+
+              <div className="admin-grid">
+                <div>
+                  <label className="label-clean">Price (₹) *</label>
+                  <input type="number" step="0.01" required value={actualPrice} onChange={e => setActualPrice(e.target.value)} className="input-clean" placeholder="0.00" />
+                </div>
+
+                <div style={{ position: 'relative' }}>
+                  <label className="label-clean">Compare at Price (₹)</label>
+                  <input type="number" step="0.01" value={discountedPrice} onChange={e => setDiscountedPrice(e.target.value)} className="input-clean" placeholder="Optional discount" />
+                  {discountPercent > 0 && (
+                    <div style={{ position: 'absolute', right: '12px', top: '38px', color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 500 }}>
+                      {discountPercent}% OFF
+                    </div>
+                  )}
+                </div>
+
+                <div>
+                  <label className="label-clean">Inventory (Units) *</label>
+                  <input type="number" required value={inStock} onChange={e => setInStock(e.target.value)} className="input-clean" />
+                </div>
+              </div>
+            </div>
+
+
             {/* SECTION: Global Sizes (Only for Simple Products) */}
             {hasVariants === 'no' && (
               <div className="clean-panel" style={{ padding: '2rem' }}>
