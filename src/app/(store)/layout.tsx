@@ -31,12 +31,7 @@ export default function StoreLayout({
                     </div>
                 </div>
 
-                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem', marginTop: '2rem', textAlign: 'center', maxWidth: '600px' }}>
-                    <div style={{ fontSize: '0.85rem', lineHeight: '1.6', opacity: 0.8 }}>
-                        <p style={{ marginBottom: '0.5rem' }}><strong>Shipping Policy:</strong> We take around 4-5 working days.</p>
-                        <p><strong>Return & Exchange Policy:</strong> We exchange the product on the basis of if you get the wrong size or color, but we do not provide refunds.</p>
-                    </div>
-
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2rem', marginTop: '2rem', width: '100%', maxWidth: '800px' }}>
                     <a
                         href="https://wa.me/918989804400"
                         target="_blank"
@@ -48,13 +43,16 @@ export default function StoreLayout({
                         </svg>
                         Customer Support: +91 8989804400
                     </a>
-                </div>
 
-                <div style={{ display: 'flex', gap: '3rem', fontSize: '0.75rem', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', marginTop: '2rem' }}>
-                    <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>SHOP</a>
-                    <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>SOCIAL</a>
-                    <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>TERMS</a>
-                    <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>PRIVACY</a>
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1rem', marginTop: '1rem' }}>
+                        <span style={{ fontSize: '0.8rem', letterSpacing: '0.1em', opacity: 0.7 }}>QUICK LINKS</span>
+                        <div style={{ display: 'flex', gap: '2rem', fontSize: '0.75rem', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.7)', flexWrap: 'wrap', justifyContent: 'center' }}>
+                            <a href="/" style={{ color: 'inherit', textDecoration: 'none' }}>HOME</a>
+                            <a href="/shop" style={{ color: 'inherit', textDecoration: 'none' }}>SHOP</a>
+                            <a href="/privacy-and-terms" style={{ color: 'inherit', textDecoration: 'none' }}>PRIVACY & TERMS</a>
+                            <a href="#" style={{ color: 'inherit', textDecoration: 'none' }}>CONTACT</a>
+                        </div>
+                    </div>
                 </div>
             </footer>
         </>
