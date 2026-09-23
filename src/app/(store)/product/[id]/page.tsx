@@ -27,6 +27,7 @@ interface Product {
     inStock: number;
     mainImageUrl: string;
     sizeChartUrl?: string;
+    galleryImages?: string[];
     variants: Variant[];
     sizes?: string[];
 }
@@ -45,8 +46,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const [isLightboxOpen, setIsLightboxOpen] = useState(false);
     const [lightboxIndex, setLightboxIndex] = useState(0);
 
+    const [showSizeChart, setShowSizeChart] = useState(false);
+    const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
     const allImages = product ? Array.from(new Set([
         product.mainImageUrl,
+        ...(product.galleryImages || []),
         ...(product.variants?.map((v: Variant) => v.imageUrl) || [])
     ].filter(Boolean))) : [];
 
@@ -68,11 +73,14 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         setSelectedColor(data.variants[0]);
                         if (data.variants[0].imageUrl) {
                             setActiveImage(data.variants[0].imageUrl);
+                            setCurrentImageIndex(0);
                         } else {
                             setActiveImage(defaultImage || '');
+                            setCurrentImageIndex(0);
                         }
                     } else {
                         setActiveImage(defaultImage || '');
+                        setCurrentImageIndex(0);
                     }
                 }
             } catch (error) {
@@ -482,18 +490,57 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     </div>
                 </div>
 
-                {/* Immersive Image Section with Lightbox toggle */}
-                <div className="image-section" style={{ cursor: 'zoom-in' }} onClick={() => {
-                    const idx = allImages.indexOf(activeImage || product.mainImageUrl);
-                    setLightboxIndex(idx >= 0 ? idx : 0);
-                    setIsLightboxOpen(true);
-                }}>
-                    <img
-                        key={activeImage} // Force re-render for animation on change
-                        src={activeImage || product.mainImageUrl}
-                        alt={product.name}
-                        loading="eager"
-                    />
+                {/* Immersive Image Section with Lightbox toggle & Carousel */}
+                <div className="image-section" style={{ position: 'relative' }}>
+                    <div style={{ width: '100%', height: '100%', cursor: 'zoom-in' }} onClick={() => {
+                        const idx = allImages.indexOf(activeImage || product.mainImageUrl);
+                        setLightboxIndex(idx >= 0 ? idx : 0);
+                        setIsLightboxOpen(true);
+                    }}>
+                        <img
+                            key={activeImage} // Force re-render for animation on change
+                            src={activeImage || product.mainImageUrl}
+                            alt={product.name}
+                            loading="eager"
+                        />
+                    </div>
+
+                    {/* Carousel Navigation (only if multiple images) */}
+                    {allImages.length > 1 && (
+                        <>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    const currentIdx = allImages.indexOf(activeImage);
+                                    let prevIdx = currentIdx <= 0 ? allImages.length - 1 : currentIdx - 1;
+                                    setActiveImage(allImages[prevIdx]);
+                                }}
+                                style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: '#fff', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer', zIndex: 10 }}
+                            >
+                                <ChevronLeft size={24} />
+                            </button>
+                            <button
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    const currentIdx = allImages.indexOf(activeImage);
+                                    let nextIdx = currentIdx === allImages.length - 1 ? 0 : currentIdx + 1;
+                                    setActiveImage(allImages[nextIdx]);
+                                }}
+                                style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: '#fff', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer', zIndex: 10 }}
+                            >
+                                <ChevronRight size={24} />
+                            </button>
+                            <div style={{ position: 'absolute', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
+                                {allImages.map((img, i) => (
+                                    <div
+                                        key={i}
+                                        onClick={(e) => { e.stopPropagation(); setActiveImage(img); }}
+                                        style={{ width: '6px', height: '6px', borderRadius: '50%', background: img === activeImage ? '#fff' : 'rgba(255,255,255,0.4)', transition: 'all 0.3s', cursor: 'pointer' }}
+                                    />
+                                ))}
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 {/* Details Section */}
@@ -535,9 +582,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             <div className="section-label">
                                 <span>Select Size</span>
                                 {product.sizeChartUrl && (
-                                    <a href={product.sizeChartUrl} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>
+                                    <button
+                                        onClick={() => setShowSizeChart(true)}
+                                        style={{ color: 'inherit', textDecoration: 'underline', background: 'none', border: 'none', fontSize: 'inherit', cursor: 'pointer', padding: 0 }}
+                                    >
                                         Size Guide
-                                    </a>
+                                    </button>
                                 )}
                             </div>
                             <div className="size-selector">
@@ -637,6 +687,26 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     </div>
                 </div>
             </div>
+
+            {/* Size Chart ModalOverlay */}
+            {showSizeChart && product.sizeChartUrl && (
+                <div style={{
+                    position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
+                    background: 'rgba(0,0,0,0.85)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem'
+                }}>
+                    <div style={{ background: '#000', borderRadius: '12px', padding: '1rem', maxWidth: '600px', width: '100%', position: 'relative', border: '1px solid #333' }}>
+                        <button
+                            onClick={() => setShowSizeChart(false)}
+                            style={{ position: 'absolute', top: '-2.5rem', right: '0', background: 'none', border: 'none', color: '#fff', fontSize: '2rem', cursor: 'pointer' }}
+                        >×</button>
+                        <img
+                            src={product.sizeChartUrl}
+                            alt="Size Guide"
+                            style={{ width: '100%', height: 'auto', borderRadius: '8px' }}
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* Lightbox Overlay */}
             {isLightboxOpen && (
