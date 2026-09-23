@@ -45,6 +45,8 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
 
     // Variants
     const availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+    const [hasVariants, setHasVariants] = useState<'unselected' | 'no' | 'yes'>('unselected');
+    const [simpleSizes, setSimpleSizes] = useState<string[]>([]);
     const [variants, setVariants] = useState<ColorVariant[]>([]);
 
     // Load product data
@@ -65,6 +67,17 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                     setGalleryImages(data.galleryImages || []);
                     setSizeChartUrl(data.sizeChartUrl || '');
                     setVariants(data.variants || []);
+                    setSimpleSizes(data.sizes || []);
+
+                    if (data.variants && data.variants.length > 0) {
+                        setHasVariants('yes');
+                    } else if (data.sizes !== undefined) {
+                        // If they specifically saved a simple product, even with 0 sizes, it will hit this
+                        setHasVariants('no');
+                    } else {
+                        // For old legacy products (no variants, no sizes field) fallback to 'no'
+                        setHasVariants('no');
+                    }
                 } else {
                     alert('Product not found!');
                     router.push('/admin/products');
@@ -208,7 +221,8 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                 mainImageUrl,
                 galleryImages,
                 sizeChartUrl,
-                variants,
+                variants: hasVariants === 'yes' ? variants : [],
+                sizes: hasVariants === 'no' ? simpleSizes : [],
                 updatedAt: new Date()
             });
 
@@ -379,70 +393,133 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                     </div>
                 </div>
 
-                {/* SECTION: Variants */}
-                <div className="clean-panel" style={{ padding: '2rem' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                        <h2 style={{ fontSize: '1.1rem', fontWeight: 500 }}>Variants</h2>
-                        <button type="button" onClick={addVariant} className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
-                            <Plus size={16} /> Add Variant
-                        </button>
-                    </div>
+                {/* SECTION: Product Type (Variants) */}
+                <div className="clean-panel" style={{ padding: '3rem 2rem' }}>
+                    <h2 style={{ fontSize: '1.5rem', fontWeight: 600, textAlign: 'center', marginBottom: '0.5rem' }}>Does this product have variants?</h2>
+                    <p style={{ textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '0.95rem', marginBottom: '3rem' }}>Variants are different colours of the same product.</p>
 
-                    {variants.length === 0 && (
-                        <div style={{ textAlign: 'center', padding: '2rem 0', color: 'var(--text-tertiary)', background: 'var(--bg-color)', borderRadius: '6px' }}>
-                            No variants added. Product will be sold as a single item.
-                        </div>
-                    )}
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                        {variants.map((variant, index) => (
-                            <div key={variant.id} style={{ padding: '1.5rem', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '8px', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-
-                                {/* Variant Image */}
-                                <div style={{ flexShrink: 0 }}>
-                                    <label className="label-clean">Image</label>
-                                    <label className="upload-zone" style={variant.imageUrl ? { width: '120px', height: '120px', borderRadius: '6px', backgroundImage: `url('${variant.imageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : { width: '120px', height: '120px', borderRadius: '6px' }}>
-                                        {!variant.imageUrl && <UploadCloud size={24} color="var(--text-tertiary)" />}
-                                        <input type="file" accept="image/*" onChange={(e) => uploadVariantImage(variant.id, e)} style={{ display: 'none' }} />
-                                        {variant.imageUrl && <div className="upload-overlay" style={{ fontSize: '0.7rem' }}>Replace</div>}
-                                    </label>
-                                </div>
-
-                                {/* Variant Details */}
-                                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: '250px' }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
-                                        <div style={{ width: '100%', maxWidth: '300px' }}>
-                                            <label className="label-clean">Color / Option Name</label>
-                                            <input type="text" placeholder="e.g. Black" value={variant.colorName} onChange={e => setVariants(variants.map(v => v.id === variant.id ? { ...v, colorName: e.target.value } : v))} className="input-clean" />
-                                        </div>
-                                        <button type="button" onClick={() => removeVariant(variant.id)} style={{ background: 'transparent', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', padding: '0.5rem', marginTop: '1.2rem' }}>
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-
-                                    <div>
-                                        <label className="label-clean">Available Sizes</label>
-                                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                                            {availableSizes.map(size => (
-                                                <button
-                                                    key={size} type="button" onClick={() => toggleVariantSize(variant.id, size)}
-                                                    style={{
-                                                        padding: '0.4rem 0.8rem', fontSize: '0.85rem', cursor: 'pointer', borderRadius: '4px', border: '1px solid', fontWeight: 500, transition: 'var(--transition-fast)',
-                                                        background: variant.sizes.includes(size) ? 'var(--text-primary)' : 'transparent',
-                                                        color: variant.sizes.includes(size) ? 'var(--bg-color)' : 'var(--text-secondary)',
-                                                        borderColor: variant.sizes.includes(size) ? 'var(--text-primary)' : 'var(--border-color)'
-                                                    }}
-                                                >
-                                                    {size}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    </div>
-                                </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '2rem', maxWidth: '700px', margin: '0 auto' }}>
+                        <div
+                            onClick={() => setHasVariants('no')}
+                            style={{ padding: '2.5rem', borderRadius: '12px', border: `2px solid ${hasVariants === 'no' ? 'var(--text-primary)' : 'transparent'}`, background: hasVariants === 'no' ? 'rgba(255,255,255,0.05)' : 'var(--bg-color)', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', boxShadow: 'inset 0 0 0 1px var(--border-color)' }}
+                        >
+                            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                                <span style={{ fontSize: '1.2rem' }}>📦</span>
                             </div>
-                        ))}
+                            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', fontWeight: 600 }}>No, Simple Product</h3>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>One image set, no colours.</p>
+                        </div>
+
+                        <div
+                            onClick={() => setHasVariants('yes')}
+                            style={{ padding: '2.5rem', borderRadius: '12px', border: `2px solid ${hasVariants === 'yes' ? 'var(--text-primary)' : 'transparent'}`, background: hasVariants === 'yes' ? 'rgba(255,255,255,0.05)' : 'var(--bg-color)', cursor: 'pointer', textAlign: 'center', transition: 'all 0.2s', boxShadow: 'inset 0 0 0 1px var(--border-color)' }}
+                        >
+                            <div style={{ width: '48px', height: '48px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                                <span style={{ fontSize: '1.2rem' }}>🎨</span>
+                            </div>
+                            <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', fontWeight: 600 }}>Yes, Has Variants</h3>
+                            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>Multiple colours, each with images.</p>
+                        </div>
                     </div>
                 </div>
+
+                {hasVariants !== 'unselected' && (
+                    <>
+                        {/* SECTION: Global Sizes (Only for Simple Products) */}
+                        {hasVariants === 'no' && (
+                            <div className="clean-panel" style={{ padding: '2rem' }}>
+                                <h2 style={{ fontSize: '1.1rem', fontWeight: 500, marginBottom: '0.5rem' }}>Available Sizes</h2>
+                                <p style={{ fontSize: '0.9rem', color: 'var(--text-tertiary)', marginBottom: '1.5rem' }}>Select all sizes this product comes in (Optional).</p>
+                                <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+                                    {availableSizes.map(size => (
+                                        <button
+                                            key={size} type="button"
+                                            onClick={() => {
+                                                if (simpleSizes.includes(size)) setSimpleSizes(simpleSizes.filter(s => s !== size));
+                                                else setSimpleSizes([...simpleSizes, size]);
+                                            }}
+                                            style={{
+                                                padding: '0.6rem 1.2rem', minWidth: '60px', fontSize: '0.9rem', cursor: 'pointer', borderRadius: '6px', border: '1px solid', fontWeight: 500, transition: 'var(--transition-fast)',
+                                                background: simpleSizes.includes(size) ? 'var(--text-primary)' : 'transparent',
+                                                color: simpleSizes.includes(size) ? 'var(--bg-color)' : 'var(--text-secondary)',
+                                                borderColor: simpleSizes.includes(size) ? 'var(--text-primary)' : 'var(--border-color)'
+                                            }}
+                                        >
+                                            {size}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* SECTION: Variants (Only for products with variants) */}
+                        {hasVariants === 'yes' && (
+                            <div className="clean-panel" style={{ padding: '2rem' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                                    <h2 style={{ fontSize: '1.1rem', fontWeight: 500 }}>Colour Variants & Images</h2>
+                                    <button type="button" onClick={addVariant} className="btn-secondary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
+                                        <Plus size={16} /> Add Colour
+                                    </button>
+                                </div>
+
+                                {variants.length === 0 && (
+                                    <div style={{ textAlign: 'center', padding: '3rem 0', color: 'var(--text-tertiary)', background: 'var(--bg-color)', borderRadius: '8px', border: '1px dashed var(--border-color)' }}>
+                                        No colours added yet. Add at least one colour above.
+                                    </div>
+                                )}
+
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                    {variants.map((variant, index) => (
+                                        <div key={variant.id} style={{ padding: '1.5rem', background: 'var(--bg-color)', border: '1px solid var(--border-color)', borderRadius: '8px', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+
+                                            {/* Variant Image */}
+                                            <div style={{ flexShrink: 0 }}>
+                                                <label className="label-clean">Image cover</label>
+                                                <label className="upload-zone" style={variant.imageUrl ? { width: '120px', height: '120px', borderRadius: '6px', backgroundImage: `url('${variant.imageUrl}')`, backgroundSize: 'cover', backgroundPosition: 'center' } : { width: '120px', height: '120px', borderRadius: '6px' }}>
+                                                    {!variant.imageUrl && <UploadCloud size={24} color="var(--text-tertiary)" />}
+                                                    <input type="file" accept="image/*" onChange={(e) => uploadVariantImage(variant.id, e)} style={{ display: 'none' }} />
+                                                    {variant.imageUrl && <div className="upload-overlay" style={{ fontSize: '0.7rem' }}>Replace</div>}
+                                                </label>
+                                            </div>
+
+                                            {/* Variant Details */}
+                                            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1.5rem', minWidth: '250px' }}>
+                                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem' }}>
+                                                    <div style={{ width: '100%', maxWidth: '300px' }}>
+                                                        <label className="label-clean">Colour Name</label>
+                                                        <input type="text" placeholder="e.g. Midnight Black" value={variant.colorName} onChange={e => setVariants(variants.map(v => v.id === variant.id ? { ...v, colorName: e.target.value } : v))} className="input-clean" />
+                                                    </div>
+                                                    <button type="button" onClick={() => removeVariant(variant.id)} style={{ background: 'transparent', border: 'none', color: 'var(--text-highlight)', cursor: 'pointer', padding: '0.5rem', marginTop: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.85rem' }}>
+                                                        <Trash2 size={16} /> Remove
+                                                    </button>
+                                                </div>
+
+                                                <div>
+                                                    <label className="label-clean">Available Sizes for {variant.colorName || 'this colour'}</label>
+                                                    <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                                        {availableSizes.map(size => (
+                                                            <button
+                                                                key={size} type="button" onClick={() => toggleVariantSize(variant.id, size)}
+                                                                style={{
+                                                                    padding: '0.4rem 0.8rem', fontSize: '0.85rem', cursor: 'pointer', borderRadius: '4px', border: '1px solid', fontWeight: 500, transition: 'var(--transition-fast)',
+                                                                    background: variant.sizes.includes(size) ? 'var(--text-primary)' : 'transparent',
+                                                                    color: variant.sizes.includes(size) ? 'var(--bg-color)' : 'var(--text-secondary)',
+                                                                    borderColor: variant.sizes.includes(size) ? 'var(--text-primary)' : 'var(--border-color)'
+                                                                }}
+                                                            >
+                                                                {size}
+                                                            </button>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </>
+                )}
             </form>
         </div>
     );

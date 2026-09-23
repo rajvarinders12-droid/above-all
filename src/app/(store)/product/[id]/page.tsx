@@ -28,6 +28,7 @@ interface Product {
     mainImageUrl: string;
     sizeChartUrl?: string;
     variants: Variant[];
+    sizes?: string[];
 }
 
 export default function ProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -84,7 +85,10 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     }, [resolvedParams.id]);
 
     const handleAddToCart = () => {
-        if (product?.variants?.length && product.variants.some(v => v.sizes?.length > 0) && !selectedSize) {
+        const hasVariantSizes = product?.variants?.length ? product.variants.some(v => v.sizes?.length > 0) : false;
+        const hasRootSizes = (!product?.variants || product.variants.length === 0) && product?.sizes && product.sizes.length > 0;
+
+        if ((hasVariantSizes || hasRootSizes) && !selectedSize) {
             alert("Please select a size");
             return;
         }
@@ -525,8 +529,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </div>
                     )}
 
-                    {/* Sizes */}
-                    {selectedColor && selectedColor.sizes && selectedColor.sizes.length > 0 && (
+                    {/* Sizes (from Variant) */}
+                    {product.variants && product.variants.length > 0 && selectedColor && selectedColor.sizes && selectedColor.sizes.length > 0 && (
                         <div>
                             <div className="section-label">
                                 <span>Select Size</span>
@@ -538,6 +542,31 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             </div>
                             <div className="size-selector">
                                 {selectedColor.sizes.map(size => (
+                                    <button
+                                        key={size}
+                                        onClick={() => setSelectedSize(size)}
+                                        className={`size-btn ${selectedSize === size ? 'active' : ''}`}
+                                    >
+                                        {size}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Sizes (from Root, simple product) */}
+                    {(!product.variants || product.variants.length === 0) && product.sizes && product.sizes.length > 0 && (
+                        <div>
+                            <div className="section-label">
+                                <span>Select Size</span>
+                                {product.sizeChartUrl && (
+                                    <a href={product.sizeChartUrl} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>
+                                        Size Guide
+                                    </a>
+                                )}
+                            </div>
+                            <div className="size-selector">
+                                {product.sizes.map(size => (
                                     <button
                                         key={size}
                                         onClick={() => setSelectedSize(size)}
