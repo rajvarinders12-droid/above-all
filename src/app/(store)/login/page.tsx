@@ -20,7 +20,7 @@ export default function LoginPage() {
 
         try {
             await signInWithEmailAndPassword(auth, email, password);
-            if (['admin@above-all.com', 'admin2@above-all.com'].includes(email)) {
+            if (['admin@above-all.com', 'admin2@above-all.com', 'admin@theabova.com'].includes(email)) {
                 router.push('/admin');
             } else {
                 router.push('/');
