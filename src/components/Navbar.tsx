@@ -123,7 +123,7 @@ export default function Navbar() {
                 alignItems: 'center',
                 transition: 'all 0.4s ease',
                 background: scrolled || menuOpen ? '#000000' : 'linear-gradient(to bottom, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%)',
-                borderBottom: (scrolled && !menuOpen) ? '1px solid rgba(255,255,255,0.05)' : '1px solid transparent',
+                borderBottom: 'none',
                 color: '#ffffff'
             }}>
                 {/* Menu Toggle */}

@@ -125,8 +125,13 @@ export default function Home() {
             {/* Duplicated array for seamless scrolling */}
             {[
               '/1.PNG', '/2.PNG', '/3.PNG', '/4.PNG', '/sample.jpg',
+              '/b1.webp', '/b2.webp', '/b3.webp', '/b4.webp', '/b5.webp', '/b6.webp',
+              '/black3.jpeg', '/green1.jpeg', '/plain white 1.jpeg', '/white 2.jpeg',
+              '/hwhite1.webp', '/hwhite2.webp',
               '/1.PNG', '/2.PNG', '/3.PNG', '/4.PNG', '/sample.jpg',
-              '/1.PNG', '/2.PNG', '/3.PNG', '/4.PNG', '/sample.jpg'
+              '/b1.webp', '/b2.webp', '/b3.webp', '/b4.webp', '/b5.webp', '/b6.webp',
+              '/black3.jpeg', '/green1.jpeg', '/plain white 1.jpeg', '/white 2.jpeg',
+              '/hwhite1.webp', '/hwhite2.webp'
             ].map((src, i) => (
               <div key={i} style={{
                 minWidth: '240px',
@@ -155,7 +160,7 @@ export default function Home() {
             100% { transform: translateX(calc(-50% - 0.75rem)); }
           }
           .marquee-track {
-            animation: marquee 60s linear infinite;
+            animation: marquee 160s linear infinite;
           }
           .marquee-track:hover {
             animation-play-state: paused;

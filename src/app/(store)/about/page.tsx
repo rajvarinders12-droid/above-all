@@ -72,6 +72,20 @@ export default function AboutPage() {
 
                 </div>
 
+                {/* Editorial Visual Grid */}
+                <div className="editorial-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '6rem', width: '100%' }}>
+                    <div className="grid-item-1" style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden' }}>
+                        <Image src="/b1.webp" alt="Abova Look 1" fill style={{ objectFit: 'cover' }} />
+                    </div>
+                    <div className="grid-item-2" style={{ position: 'relative', aspectRatio: '3/4', transform: 'translateY(15%)', overflow: 'hidden' }}>
+                        <Image src="/black1.HEIC" alt="Abova Look 2" fill style={{ objectFit: 'cover', background: '#111' }} onError={(e) => { e.currentTarget.src = "/black3.jpeg"; }} />
+                        {/* Fallback to black3.jpeg since Next might not support HEIC in all browsers natively in standard img tags, but Next.js loader might convert it - just a safe fallback */}
+                    </div>
+                    <div className="grid-item-3" style={{ position: 'relative', aspectRatio: '3/4', overflow: 'hidden' }}>
+                        <Image src="/green1.jpeg" alt="Abova Look 3" fill style={{ objectFit: 'cover' }} />
+                    </div>
+                </div>
+
                 {/* GenZ Quote Section */}
                 <div className="quote-section" style={{ borderTop: '1px solid rgba(255,255,255,0.1)', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
                     <p className="quote-text" style={{ fontFamily: 'var(--font-serif)', fontStyle: 'italic', color: 'rgba(255,255,255,0.9)', margin: 0 }}>
@@ -163,6 +177,14 @@ export default function AboutPage() {
                     .quote-text {
                         font-size: 1.8rem;
                         line-height: 1.5;
+                    }
+                    .editorial-grid {
+                        grid-template-columns: 1fr;
+                        gap: 2rem;
+                        margin-top: 4rem !important;
+                    }
+                    .grid-item-2 {
+                        transform: translateY(0) !important;
                     }
                 }
             `}} />
