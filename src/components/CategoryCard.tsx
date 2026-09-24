@@ -12,6 +12,11 @@ interface CategoryCardProps {
 
 export default function CategoryCard({ title, href, imageUrl, hoverImageUrl }: CategoryCardProps) {
     const [isHovered, setIsHovered] = useState(false);
+    const [hoverError, setHoverError] = useState(false);
+
+    // Clean string check to prevent empty string with spaces returning true
+    const validHoverUrl = hoverImageUrl?.trim() ? hoverImageUrl.trim() : null;
+    const hasValidHover = Boolean(validHoverUrl) && !hoverError;
 
     return (
         <Link href={href} style={{ textDecoration: 'none', color: 'white', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -41,14 +46,15 @@ export default function CategoryCard({ title, href, imageUrl, hoverImageUrl }: C
                         height: '100%',
                         objectFit: 'cover',
                         transition: 'opacity 0.5s ease',
-                        opacity: isHovered && hoverImageUrl ? 0 : 1,
+                        opacity: isHovered && hasValidHover ? 0 : 1,
                     }}
                 />
 
-                {hoverImageUrl && (
+                {hasValidHover && validHoverUrl && (
                     <img
-                        src={hoverImageUrl}
+                        src={validHoverUrl}
                         alt={`${title} hover`}
+                        onError={() => setHoverError(true)}
                         style={{
                             position: 'absolute',
                             top: 0,
