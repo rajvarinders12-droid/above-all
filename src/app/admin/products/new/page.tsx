@@ -91,7 +91,7 @@ export default function AddProductPage() {
         body: formData
       });
       const data = await res.json();
-      return data.secure_url;
+      return data.secure_url ? data.secure_url.replace('/upload/', '/upload/f_auto,q_auto/') : null;
     } catch (err) {
       console.error("Cloudinary upload error:", err);
       alert("Failed to upload image. Please check credentials.");
