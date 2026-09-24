@@ -592,8 +592,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                     {/* Title and Price */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
-                        <h1 className="product-title" style={{ fontSize: 'clamp(2.5rem, 4.5vw, 3.5rem)', margin: 0, fontWeight: 700 }}>{product.name}</h1>
-                        <div className="product-price" style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                        <h1 className="product-title" style={{ fontSize: 'clamp(1.75rem, 4.5vw, 3.5rem)', margin: 0, fontWeight: 700 }}>{product.name}</h1>
+                        <div className="product-price" style={{ margin: 0, fontSize: 'clamp(1.2rem, 3vw, 1.5rem)', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <span style={{ fontWeight: 600 }}>RS. {sellingPrice.toLocaleString('en-IN')}</span>
                             {hasDiscount && (
                                 <>
@@ -612,7 +612,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     <div className="section-label">
                         <span>DESCRIPTION</span>
                     </div>
-                    <div style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.75, marginBottom: '2.5rem', whiteSpace: 'pre-wrap' }}>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: 'clamp(0.9rem, 2vw, 1.1rem)', lineHeight: 1.75, marginBottom: '2.5rem', whiteSpace: 'pre-wrap' }}>
                         {product.description || 'No description available for this product.'}
                     </div>
 
@@ -677,9 +677,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             <div className="section-label">
                                 <span>Select Size</span>
                                 {product.sizeChartUrl && (
-                                    <a href={product.sizeChartUrl} target="_blank" rel="noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>
+                                    <button
+                                        onClick={() => setShowSizeChart(true)}
+                                        style={{ color: 'inherit', textDecoration: 'underline', background: 'none', border: 'none', fontSize: 'inherit', cursor: 'pointer', padding: 0 }}
+                                    >
                                         Size Guide
-                                    </a>
+                                    </button>
                                 )}
                             </div>
                             <div className="size-selector">
