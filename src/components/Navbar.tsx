@@ -30,6 +30,13 @@ export default function Navbar() {
 
     useEffect(() => {
         setMounted(true);
+        if (typeof window !== 'undefined' && !sessionStorage.getItem('splashShown')) {
+            // After splash animation completes (e.g., 2.5s), mark it as shown
+            setTimeout(() => {
+                sessionStorage.setItem('splashShown', 'true');
+            }, 2600);
+        }
+
         initialize();
         const handleScroll = () => {
             setScrolled(window.scrollY > 10);
@@ -60,7 +67,7 @@ export default function Navbar() {
         }
 
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [menuOpen, searchOpen, navCategories.length]);
+    }, [menuOpen, searchOpen, navCategories.length, initialize]);
 
     // Fetch products once when search is opened
     useEffect(() => {
@@ -138,10 +145,12 @@ export default function Navbar() {
                 </div>
 
                 {/* Splash Reveal Overlay */}
-                <div className="splash-overlay" />
+                {(!mounted || !sessionStorage.getItem('splashShown')) && (
+                    <div className="splash-overlay" />
+                )}
 
                 {/* Logo */}
-                <div className="logo-anim-wrapper" style={{ zIndex: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', position: 'absolute', left: '50%' }}>
+                <div className={mounted && sessionStorage.getItem('splashShown') ? '' : 'logo-anim-wrapper'} style={{ zIndex: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', position: 'absolute', left: '50%', transform: mounted && sessionStorage.getItem('splashShown') ? 'translateX(-50%)' : '' }}>
                     <Link href="/" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Image
                             src="/abova-logo.png"

@@ -361,13 +361,13 @@ export default function AddProductPage() {
 
               <div className="admin-grid">
                 <div>
-                  <label className="label-clean">Compare at Price (Original ₹)</label>
-                  <input type="number" step="0.01" value={actualPrice} onChange={e => setActualPrice(e.target.value)} className="input-clean" placeholder="e.g. 100 (Optional)" />
+                  <label className="label-clean">MRP (Maximum Retail Price) ₹</label>
+                  <input type="number" step="0.01" value={actualPrice} onChange={e => setActualPrice(e.target.value)} className="input-clean" placeholder="e.g. 2000 (Optional)" />
                 </div>
 
                 <div style={{ position: 'relative' }}>
-                  <label className="label-clean">Actual Selling Price (₹) *</label>
-                  <input type="number" step="0.01" required value={discountedPrice} onChange={e => setDiscountedPrice(e.target.value)} className="input-clean" placeholder="e.g. 60" />
+                  <label className="label-clean">Discounted Price (Selling Price) ₹ *</label>
+                  <input type="number" step="0.01" required value={discountedPrice} onChange={e => setDiscountedPrice(e.target.value)} className="input-clean" placeholder="e.g. 1499" />
                   {discountPercent > 0 && (
                     <div style={{ position: 'absolute', right: '12px', top: '38px', color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 500 }}>
                       {discountPercent}% OFF
