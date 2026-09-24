@@ -285,15 +285,21 @@ export default function ShopPage() {
                             value={sortOrder}
                             onChange={(e) => setSortOrder(e.target.value)}
                             style={{
+                                WebkitAppearance: 'none',
+                                appearance: 'none',
                                 background: 'transparent',
                                 color: '#fff',
-                                border: 'none',
+                                border: '1px solid #fff',
+                                borderRadius: '30px',
                                 outline: 'none',
-                                borderBottom: '1px solid #fff',
-                                padding: '0.5rem 0',
+                                padding: '0.4rem 2.5rem 0.4rem 1rem',
                                 cursor: 'pointer',
                                 fontFamily: 'var(--font-sans)',
-                                fontSize: '0.95rem'
+                                fontSize: '0.95rem',
+                                backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6-6"/></svg>')`,
+                                backgroundRepeat: 'no-repeat',
+                                backgroundPosition: 'right 0.8rem center',
+                                backgroundSize: '16px'
                             }}
                         >
                             <option value="featured" style={{ color: '#000' }}>Featured</option>
