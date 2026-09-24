@@ -80,7 +80,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 querySnapshot.forEach((docSnap) => {
                     if (docSnap.id !== resolvedParams.id) {
                         const d = docSnap.data();
-                        prods.push({ id: docSnap.id, name: d.name, price: d.actualPrice || d.price || 0, imageUrl: d.mainImageUrl || d.imageUrl || '' });
+                        prods.push({ id: docSnap.id, name: d.name, price: d.actualPrice || d.price || 0, actualPrice: d.actualPrice || 0, discountedPrice: d.discountedPrice || 0, imageUrl: d.mainImageUrl || d.imageUrl || '' });
                     }
                 });
                 for (let i = prods.length - 1; i > 0; i--) {
