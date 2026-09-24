@@ -140,8 +140,14 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', fontSize: '0.95rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
                                 <span>Subtotal ({totalItems} items)</span>
-                                <span>₹{parseFloat(order.totalAmount || 0).toLocaleString()}</span>
+                                <span>₹{parseFloat(order.subtotal || order.totalAmount || 0).toLocaleString()}</span>
                             </div>
+                            {order.couponApplied && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4ade80' }}>
+                                    <span>Discount ({order.couponApplied})</span>
+                                    <span>- ₹{parseFloat(order.discountAmount || 0).toLocaleString()}</span>
+                                </div>
+                            )}
                             <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-secondary)' }}>
                                 <span>Shipping</span>
                                 <span>Free</span>
