@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import QuickViewModal from './QuickViewModal';
 
@@ -32,29 +33,50 @@ function ProductCardItem({ product }: { product: Product }) {
 
   const [touchStart, setTouchStart] = useState<number | null>(null);
 
+  const router = useRouter();
+
   const handleNext = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (currentIdx < images.length - 1) setCurrentIdx(currentIdx + 1);
+    if (images.length > 1) {
+      setCurrentIdx((prev) => (prev < images.length - 1 ? prev + 1 : 0));
+    }
   };
 
   const handlePrev = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (currentIdx > 0) setCurrentIdx(currentIdx - 1);
+    if (images.length > 1) {
+      setCurrentIdx((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+    }
   };
+
+  // State to track if the user is swiping, so we don't accidentally navigate
+  const [isSwiping, setIsSwiping] = useState(false);
 
   const onTouchStart = (e: React.TouchEvent) => {
     setTouchStart(e.touches[0].clientX);
+    setIsSwiping(false);
   };
 
   const onTouchEnd = (e: React.TouchEvent) => {
     if (!touchStart) return;
     const touchEnd = e.changedTouches[0].clientX;
     const delta = touchStart - touchEnd;
-    if (delta > 40) handleNext(e); // Swiped left -> next image
-    if (delta < -40) handlePrev(e); // Swiped right -> prev image
+    if (Math.abs(delta) > 40) {
+      setIsSwiping(true);
+      if (delta > 40) handleNext(e); // Swiped left -> next image
+      if (delta < -40) handlePrev(e); // Swiped right -> prev image
+    }
     setTouchStart(null);
+  };
+
+  const handleCardNavigate = (e: React.MouseEvent | React.TouchEvent) => {
+    if (isSwiping) {
+      e.preventDefault();
+      return;
+    }
+    router.push(`/product/${product.id}`);
   };
 
   return (
@@ -69,7 +91,10 @@ function ProductCardItem({ product }: { product: Product }) {
       }}
     >
       {/* Image Container */}
-      <Link href={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
+      <div
+        onClick={handleCardNavigate}
+        style={{ cursor: 'pointer', display: 'block' }}
+      >
         <div style={{
           width: '100%',
           aspectRatio: '4/5',
@@ -108,57 +133,53 @@ function ProductCardItem({ product }: { product: Product }) {
           )}
 
           {/* Carousel Arrows (Visual only for now, visible on hover) */}
-          {images.length > 1 && currentIdx > 0 && (
-            <div
-              className="carousel-arrow"
-              onClick={handlePrev}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '12px',
-                transform: 'translateY(-50%)',
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                opacity: isHovered ? 1 : 0,
-                transition: 'opacity 0.3s ease',
-                zIndex: 10,
-              }}>
-              <ChevronLeft size={20} />
-            </div>
-          )}
+          <div
+            className="carousel-arrow"
+            onClick={handlePrev}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              left: '12px',
+              transform: 'translateY(-50%)',
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              opacity: isHovered ? 1 : 0,
+              transition: 'opacity 0.3s ease',
+              zIndex: 10,
+            }}>
+            <ChevronLeft size={20} />
+          </div>
 
-          {images.length > 1 && currentIdx < images.length - 1 && (
-            <div
-              className="carousel-arrow"
-              onClick={handleNext}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                right: '12px',
-                transform: 'translateY(-50%)',
-                width: '36px',
-                height: '36px',
-                borderRadius: '50%',
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                backdropFilter: 'blur(8px)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                opacity: isHovered ? 1 : 0,
-                transition: 'opacity 0.3s ease',
-                zIndex: 10,
-              }}>
-              <ChevronRight size={20} />
-            </div>
-          )}
+          <div
+            className="carousel-arrow"
+            onClick={handleNext}
+            style={{
+              position: 'absolute',
+              top: '50%',
+              right: '12px',
+              transform: 'translateY(-50%)',
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              backdropFilter: 'blur(8px)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              opacity: isHovered ? 1 : 0,
+              transition: 'opacity 0.3s ease',
+              zIndex: 10,
+            }}>
+            <ChevronRight size={20} />
+          </div>
 
           {/* Pagination Dots */}
           {images.length > 1 && (
@@ -184,7 +205,7 @@ function ProductCardItem({ product }: { product: Product }) {
             </div>
           )}
         </div>
-      </Link>
+      </div>
 
       {/* Product Info */}
       <div style={{
