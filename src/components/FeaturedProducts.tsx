@@ -1,159 +1,48 @@
-'use client';
-
-import { useEffect, useState } from 'react';
 import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import Link from 'next/link';
-import QuickViewModal from './QuickViewModal';
+import ProductCardItem from './ProductCardItem';
 
-interface Product {
-  id: string;
-  name: string;
-  price: number;
-  imageUrl: string;
-  mainImageUrl?: string;
-  variants?: any[];
-  actualPrice?: number;
-  discountedPrice?: number;
-  inStock?: number;
-}
+export default async function FeaturedProducts() {
+  let products: any[] = [];
 
-function ProductCardItem({ product }: { product: Product }) {
-  const [isHovered, setIsHovered] = useState(false);
-  const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  try {
+    const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(6));
+    const querySnapshot = await getDocs(q);
+    const fetchedProducts: any[] = [];
 
-  const displayImage = product.mainImageUrl || product.imageUrl || '';
+    querySnapshot.forEach((doc) => {
+      const data = doc.data();
 
-  return (
-    <div
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        position: 'relative',
-        gap: '0.75rem',
-      }}
-    >
-      {/* Image Container */}
-      <Link href={`/product/${product.id}`} style={{ textDecoration: 'none' }}>
-        <div style={{
-          width: '100%',
-          aspectRatio: '4/5',
-          backgroundColor: '#0a0a0a',
-          position: 'relative',
-          borderRadius: '16px',
-          overflow: 'hidden',
-        }}>
-          {displayImage ? (
-            <div style={{
-              width: '100%',
-              height: '100%',
-              backgroundImage: `url('${displayImage}')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-              transform: isHovered ? 'scale(1.03)' : 'scale(1)',
-            }} />
-          ) : (
-            <div style={{
-              width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333'
-            }}>
-              NO IMAGE
-            </div>
-          )}
-        </div>
-      </Link>
+      let originalPrice = Number(data.actualPrice || data.price || 0);
+      let sellingPrice = Number(data.discountedPrice) > 0 ? Number(data.discountedPrice) : originalPrice;
 
-      {/* Product Info */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'flex-start',
-        padding: '0 0.25rem'
-      }}>
-        <Link href={`/product/${product.id}`} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', textDecoration: 'none' }}>
-          <h3 style={{
-            fontFamily: 'var(--font-sans)',
-            fontSize: '0.95rem',
-            fontWeight: 500,
-            margin: 0,
-            color: '#ffffff',
-            lineHeight: '1.2'
-          }}>
-            {product.name}
-          </h3>
-          <p style={{
-            color: '#ffffff',
-            fontWeight: 500,
-            fontSize: '0.85rem',
-            margin: 0,
-          }}>
-            RS. {(product.discountedPrice && product.discountedPrice > 0 ? product.discountedPrice : (product.actualPrice || product.price || 0)).toLocaleString('en-IN')}
-          </p>
-        </Link>
-      </div>
-
-      {isQuickViewOpen && <QuickViewModal product={product as any} onClose={() => setIsQuickViewOpen(false)} />}
-    </div>
-  );
-}
-
-export default function FeaturedProducts() {
-  const [products, setProducts] = useState<Product[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function fetchProducts() {
-      try {
-        const q = query(collection(db, 'products'), orderBy('createdAt', 'desc'), limit(6));
-        const querySnapshot = await getDocs(q);
-        const fetchedProducts: Product[] = [];
-
-        querySnapshot.forEach((doc) => {
-          const data = doc.data();
-
-          let originalPrice = Number(data.actualPrice || data.price || 0);
-          let sellingPrice = Number(data.discountedPrice) > 0 ? Number(data.discountedPrice) : originalPrice;
-
-          // Auto-correct if user entered the prices backwards in the admin portal
-          if (sellingPrice > originalPrice && originalPrice > 0) {
-            const temp = sellingPrice;
-            sellingPrice = originalPrice;
-            originalPrice = temp;
-          }
-
-          fetchedProducts.push({
-            id: doc.id,
-            name: data.name || 'Unnamed Product',
-            price: originalPrice,
-            imageUrl: data.mainImageUrl || data.imageUrl || '',
-            mainImageUrl: data.mainImageUrl || data.imageUrl || '',
-            variants: data.variants || [],
-            actualPrice: originalPrice,
-            discountedPrice: sellingPrice !== originalPrice ? sellingPrice : 0,
-            inStock: data.inStock || 0
-          });
-        });
-
-        setProducts(fetchedProducts);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
+      // Auto-correct if user entered the prices backwards in the admin portal
+      if (sellingPrice > originalPrice && originalPrice > 0) {
+        const temp = sellingPrice;
+        sellingPrice = originalPrice;
+        originalPrice = temp;
       }
-    }
 
-    fetchProducts();
-  }, []);
+      fetchedProducts.push({
+        id: doc.id,
+        name: data.name || 'Unnamed Product',
+        price: originalPrice,
+        imageUrl: data.mainImageUrl || data.imageUrl || '',
+        mainImageUrl: data.mainImageUrl || data.imageUrl || '',
+        variants: data.variants || [],
+        actualPrice: originalPrice,
+        discountedPrice: sellingPrice !== originalPrice ? sellingPrice : 0,
+        inStock: data.inStock || 0
+      });
+    });
 
-  if (loading) {
-    return <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--accent-gold)' }}>Loading exclusive collection...</div>;
+    products = fetchedProducts;
+  } catch (error) {
+    console.error("Error fetching products:", error);
   }
 
   if (products.length === 0) {
-    return <div style={{ textAlign: 'center', padding: '4rem', color: 'rgba(255,255,255,0.6)' }}>No products in the collection yet.</div>;
+    return null;
   }
 
   return (
