@@ -162,7 +162,6 @@ export default function ShopPage() {
 
     // Filters State
     const [selectedCategory, setSelectedCategory] = useState<string>('All');
-    const [sortOrder, setSortOrder] = useState<string>('featured'); // 'featured', 'price-asc', 'price-desc'
 
     useEffect(() => {
         async function fetchData() {
@@ -209,12 +208,6 @@ export default function ShopPage() {
         filteredProducts = filteredProducts.filter(p =>
             p.category?.toLowerCase() === selectedCategory.toLowerCase()
         );
-    }
-
-    if (sortOrder === 'price-asc') {
-        filteredProducts = [...filteredProducts].sort((a, b) => (a.price || 0) - (b.price || 0));
-    } else if (sortOrder === 'price-desc') {
-        filteredProducts = [...filteredProducts].sort((a, b) => (b.price || 0) - (a.price || 0));
     }
 
     if (loading) {
@@ -277,35 +270,6 @@ export default function ShopPage() {
                                 {cat.name}
                             </button>
                         ))}
-                    </div>
-
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                        <span style={{ fontWeight: 600, fontSize: '0.9rem', color: '#888' }}>Sort By:</span>
-                        <select
-                            value={sortOrder}
-                            onChange={(e) => setSortOrder(e.target.value)}
-                            style={{
-                                WebkitAppearance: 'none',
-                                appearance: 'none',
-                                background: 'transparent',
-                                color: '#fff',
-                                border: '1px solid #fff',
-                                borderRadius: '30px',
-                                outline: 'none',
-                                padding: '0.4rem 2.5rem 0.4rem 1rem',
-                                cursor: 'pointer',
-                                fontFamily: 'var(--font-sans)',
-                                fontSize: '0.95rem',
-                                backgroundImage: `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6-6"/></svg>')`,
-                                backgroundRepeat: 'no-repeat',
-                                backgroundPosition: 'right 0.8rem center',
-                                backgroundSize: '16px'
-                            }}
-                        >
-                            <option value="featured" style={{ color: '#000' }}>Featured</option>
-                            <option value="price-asc" style={{ color: '#000' }}>Price: Low to High</option>
-                            <option value="price-desc" style={{ color: '#000' }}>Price: High to Low</option>
-                        </select>
                     </div>
                 </div>
 
