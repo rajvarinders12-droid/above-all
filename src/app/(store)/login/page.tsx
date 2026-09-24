@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { signInWithEmailAndPassword, signInWithRedirect, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithRedirect, onAuthStateChanged, getRedirectResult } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 import Link from 'next/link';
 
@@ -14,6 +14,7 @@ export default function LoginPage() {
     const router = useRouter();
 
     useEffect(() => {
+        getRedirectResult(auth).catch(console.error);
         const unsubscribe = onAuthStateChanged(auth, (user) => {
             if (user) {
                 if (['admin@above-all.com', 'admin2@above-all.com', 'admin@theabova.com'].includes(user.email || '')) {

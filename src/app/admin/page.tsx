@@ -2,7 +2,7 @@
 
 import { IndianRupee, PackageIcon, ShoppingBag, Users, Download } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import Link from 'next/link';
 
@@ -12,27 +12,42 @@ export default function AdminDashboard() {
   const [totalRevenue, setTotalRevenue] = useState(0);
 
   useEffect(() => {
-    async function fetchStats() {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
-        setProductCount(querySnapshot.size);
+    // 1. Fetch products count once
+    getDocs(collection(db, 'products'))
+      .then(snap => setProductCount(snap.size))
+      .catch(() => setProductCount(0));
 
-        const ordersSnapshot = await getDocs(query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(10)));
-        const orders: any[] = [];
-        let revenue = 0;
-        ordersSnapshot.forEach(doc => {
+    // 2. Listen to orders live
+    const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'), limit(50));
+
+    const unsubscribe = onSnapshot(q, (ordersSnapshot) => {
+      const orders: any[] = [];
+      let revenue = 0;
+      ordersSnapshot.forEach(doc => {
+        const data = doc.data();
+        orders.push({ id: doc.id, ...data });
+        if (data.totalAmount) revenue += data.totalAmount;
+      });
+      setRecentOrders(orders.slice(0, 10)); // Top 10 for display
+      setTotalRevenue(revenue);
+    }, (error) => {
+      console.error("Error in live orders dashboard:", error);
+      // Fallback if index missing
+      const fallbackUnsubscribe = onSnapshot(collection(db, 'orders'), (snapshot) => {
+        const manualOrders: any[] = [];
+        let rev = 0;
+        snapshot.forEach(doc => {
           const data = doc.data();
-          orders.push({ id: doc.id, ...data });
-          if (data.totalAmount) revenue += data.totalAmount;
+          manualOrders.push({ id: doc.id, ...data });
+          if (data.totalAmount) rev += data.totalAmount;
         });
-        setRecentOrders(orders);
-        setTotalRevenue(revenue);
-      } catch (error) {
-        console.error("Error fetching stats:", error);
-        setProductCount(0);
-      }
-    }
-    fetchStats();
+        manualOrders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+        setRecentOrders(manualOrders.slice(0, 10));
+        setTotalRevenue(rev);
+      });
+    });
+
+    return () => unsubscribe();
   }, []);
 
   const stats = [

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ShoppingBag, FileText } from 'lucide-react';
 
@@ -10,25 +10,28 @@ export default function OrdersPage() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        async function fetchOrders() {
-            try {
-                const querySnapshot = await getDocs(collection(db, 'orders'));
-                const fetched = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
-                // Try to sort manually if createdAt exists to avoid forcing an index right away
-                fetched.sort((a, b) => {
+        const q = query(collection(db, 'orders'), orderBy('createdAt', 'desc'));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            const fetched = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+            setOrders(fetched);
+            setLoading(false);
+        }, (error) => {
+            console.error("Error fetching live orders:", error);
+            // Fallback for missing index: just listen to the whole collection and sort in memory
+            const fallbackUnsubscribe = onSnapshot(collection(db, 'orders'), (snapshot) => {
+                const manualFetched = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as any));
+                manualFetched.sort((a, b) => {
                     if (a.createdAt && b.createdAt) {
                         return b.createdAt.seconds - a.createdAt.seconds;
                     }
                     return 0;
                 });
-                setOrders(fetched);
-            } catch (error) {
-                console.error("Error fetching orders:", error);
-            } finally {
+                setOrders(manualFetched);
                 setLoading(false);
-            }
-        }
-        fetchOrders();
+            });
+        });
+
+        return () => unsubscribe();
     }, []);
 
     return (
