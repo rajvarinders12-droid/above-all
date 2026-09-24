@@ -1,20 +1,21 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ArrowLeft, Package, User, MapPin, CreditCard, ChevronDown, CheckCircle2 } from 'lucide-react';
 import Link from 'next/link';
 
-export default function OrderDetailsPage({ params }: { params: { id: string } }) {
+export default function OrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+    const { id } = use(params);
     const router = useRouter();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updatingStatus, setUpdatingStatus] = useState(false);
 
     useEffect(() => {
-        const unsubscribe = onSnapshot(doc(db, 'orders', params.id), (docSnap) => {
+        const unsubscribe = onSnapshot(doc(db, 'orders', id), (docSnap) => {
             if (docSnap.exists()) {
                 setOrder({ id: docSnap.id, ...docSnap.data() });
             } else {
@@ -23,7 +24,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             setLoading(false);
         });
         return () => unsubscribe();
-    }, [params.id]);
+    }, [id]);
 
     const handleStatusUpdate = async (newStatus: string) => {
         if (!order || order.status === newStatus) return;
