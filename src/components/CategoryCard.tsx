@@ -37,9 +37,11 @@ export default function CategoryCard({ title, href, imageUrl, hoverImageUrl }: C
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        background: `url(${imageUrl}) center/cover no-repeat`,
-                        transition: 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease',
-                        transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                        backgroundImage: `url("${imageUrl}")`,
+                        backgroundPosition: 'center',
+                        backgroundSize: 'cover',
+                        backgroundRepeat: 'no-repeat',
+                        transition: 'opacity 0.5s ease',
                         opacity: isHovered && hoverImageUrl ? 0 : 1,
                     }}
                 />
@@ -52,9 +54,11 @@ export default function CategoryCard({ title, href, imageUrl, hoverImageUrl }: C
                             left: 0,
                             width: '100%',
                             height: '100%',
-                            background: `url(${hoverImageUrl}) center/cover no-repeat`,
-                            transition: 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.5s ease',
-                            transform: isHovered ? 'scale(1.05)' : 'scale(1)',
+                            backgroundImage: `url("${hoverImageUrl}")`,
+                            backgroundPosition: 'center',
+                            backgroundSize: 'cover',
+                            backgroundRepeat: 'no-repeat',
+                            transition: 'opacity 0.5s ease',
                             opacity: isHovered ? 1 : 0,
                         }}
                     />
