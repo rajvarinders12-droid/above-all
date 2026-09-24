@@ -1,5 +1,8 @@
 'use client';
 
+// export const dynamic = 'force-dynamic';  // Not needed here because it's 'use client'. But we can force it in layout or just rely on 'use client' doing fetch on mount.
+// Wait, 'use client' fetches in useEffect, so it should bypass caching anyway. But there might be a route cache.
+
 import { useEffect, useState } from 'react';
 import { collection, getDocs, orderBy, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';

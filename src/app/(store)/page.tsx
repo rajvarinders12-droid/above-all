@@ -3,6 +3,8 @@ import DynamicCategories from '@/components/DynamicCategories';
 import Link from 'next/link';
 import Image from 'next/image';
 
+export const dynamic = 'force-dynamic';
+
 export default function Home() {
   return (
     <div style={{ background: '#000000', color: '#ffffff', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
