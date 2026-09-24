@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword, updateProfile, signInWithPopup } from 'firebase/auth';
+import { createUserWithEmailAndPassword, updateProfile, signInWithRedirect, onAuthStateChanged } from 'firebase/auth';
 import { auth, googleProvider } from '@/lib/firebase';
 import Link from 'next/link';
 
@@ -14,6 +14,21 @@ export default function SignupPage() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    import('react').then(React => {
+        React.useEffect(() => {
+            const unsubscribe = onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    if (['admin@above-all.com', 'admin2@above-all.com', 'admin@theabova.com'].includes(user.email || '')) {
+                        router.push('/admin');
+                    } else {
+                        router.push('/');
+                    }
+                }
+            });
+            return () => unsubscribe();
+        }, [router]);
+    });
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -54,15 +69,9 @@ export default function SignupPage() {
         setLoading(true);
         setError('');
         try {
-            const result = await signInWithPopup(auth, googleProvider);
-            if (['admin@above-all.com', 'admin2@above-all.com', 'admin@theabova.com'].includes(result.user.email || '')) {
-                router.push('/admin');
-            } else {
-                router.push('/');
-            }
+            await signInWithRedirect(auth, googleProvider);
         } catch (err: any) {
             setError(err.message || 'Failed to sign up with Google');
-        } finally {
             setLoading(false);
         }
     };
