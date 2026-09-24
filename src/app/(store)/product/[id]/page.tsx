@@ -48,6 +48,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
     const [showSizeChart, setShowSizeChart] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
+    const [quantity, setQuantity] = useState(1);
 
     const allImages = product ? Array.from(new Set([
         product.mainImageUrl,
@@ -111,7 +112,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
             imageUrl: activeImage || product!.mainImageUrl,
             colorName: selectedColor?.colorName,
             size: selectedSize,
-            quantity: 1
+            quantity: quantity
         });
 
         setAdded(true);
@@ -453,11 +454,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     .image-section {
                         position: relative;
                         top: 0;
-                        height: 65vh;
+                        height: auto;
                         width: 100%;
                     }
                     .details-section {
-                        padding: 2.5rem 1.5rem;
+                        padding: 1rem 1.5rem 2.5rem 1.5rem;
                     }
                     .product-title {
                         font-size: 2.25rem;
@@ -556,18 +557,38 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                         transition: 'all 0.3s ease'
                                     }}
                                 >
-                                    <img src={img} alt={`Thumbnail ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                    <img
+                                        src={img}
+                                        alt={`Thumbnail ${i}`}
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                        onError={(e) => {
+                                            if (e.currentTarget.parentElement) {
+                                                e.currentTarget.parentElement.style.display = 'none';
+                                            }
+                                        }}
+                                    />
                                 </div>
                             ))}
                         </div>
                     )}
+
+                    {/* Title and Price in Left Column for specific layout */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem', padding: '0 1rem' }}>
+                        <h1 className="product-title" style={{ fontSize: 'clamp(2rem, 3vw, 2.5rem)', margin: 0 }}>{product.name}</h1>
+                        <div className="product-price" style={{ margin: 0, marginBottom: '1rem', fontSize: '1.25rem' }}>RS. {price.toLocaleString('en-IN')}</div>
+                    </div>
                 </div>
 
                 {/* Details Section */}
                 <div className="details-section">
 
-                    <h1 className="product-title">{product.name}</h1>
-                    <div className="product-price">RS. {price.toLocaleString('en-IN')}</div>
+                    {/* DESCRIPTION moved to top of right side */}
+                    <div className="section-label">
+                        <span>DESCRIPTION</span>
+                    </div>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2.5rem', whiteSpace: 'pre-wrap' }}>
+                        {product.description || 'No description available for this product.'}
+                    </div>
 
                     {/* Colors */}
                     {product.variants && product.variants.length > 0 && (
@@ -649,6 +670,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </div>
                     )}
 
+                    {/* Quantity */}
+                    <div className="section-label">
+                        <span>Quantity</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', marginBottom: '2.5rem', width: 'fit-content', border: '1px solid rgba(255,255,255,0.15)', borderRadius: '4px' }}>
+                        <button onClick={() => setQuantity(Math.max(1, quantity - 1))} style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--text-primary)', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>-</button>
+                        <span style={{ padding: '0.5rem 1rem', minWidth: '40px', textAlign: 'center' }}>{quantity}</span>
+                        <button onClick={() => setQuantity(quantity + 1)} style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--text-primary)', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}>+</button>
+                    </div>
+
                     {/* Actions */}
                     <div className="action-buttons" style={{ gridTemplateColumns: '1fr' }}>
                         <button
@@ -656,10 +687,12 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             disabled={product.inStock !== undefined && product.inStock <= 0}
                             className="btn-premium btn-buy"
                             style={{
-                                background: added ? '#2ecc71' : 'var(--text-primary)',
-                                color: added ? '#fff' : 'var(--bg-color)',
-                                borderColor: added ? '#2ecc71' : 'var(--text-primary)',
-                                padding: '1.25rem 2rem'
+                                background: added ? '#2ecc71' : '#fff',
+                                color: added ? '#fff' : '#000',
+                                borderColor: added ? '#2ecc71' : '#fff',
+                                padding: '1.25rem 2rem',
+                                borderRadius: '4px',
+                                fontWeight: 700
                             }}
                         >
                             {(product.inStock !== undefined && product.inStock <= 0) ? 'OUT OF STOCK' : added ? (
@@ -670,8 +703,8 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </button>
                     </div>
 
-                    {/* Tabs */}
-                    <div className="tabs-container">
+                    {/* Tabs / Product Features */}
+                    <div className="tabs-container" style={{ marginTop: '2rem' }}>
                         <div className="tabs-header">
                             <div onClick={() => setActiveTab('details')} className={`tab-item ${activeTab === 'details' ? 'active' : ''}`}>Details</div>
                             <div onClick={() => setActiveTab('washcare')} className={`tab-item ${activeTab === 'washcare' ? 'active' : ''}`}>Washcare</div>
