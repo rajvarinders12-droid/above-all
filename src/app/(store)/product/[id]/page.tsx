@@ -167,7 +167,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 __html: `
                 .premium-product-layout {
                     display: grid;
-                    grid-template-columns: 40% 60%;
+                    grid-template-columns: 50% 50%;
                     grid-template-rows: auto 1fr;
                     min-height: 100vh;
                     padding-top: 80px;
@@ -194,7 +194,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 }
 
                 .details-section {
-                    padding: 4rem 10%;
+                    padding: 1rem 8% 4rem 8%;
                     display: flex;
                     flex-direction: column;
                     justify-content: center;
@@ -203,7 +203,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                 .breadcrumb-container {
                     grid-column: 1 / -1;
-                    padding: 1.5rem 5% 1rem 5%;
+                    padding: 1.5rem 5% 0.5rem 5%;
                     background: var(--bg-color);
                     display: flex;
                     width: 100%;
@@ -591,9 +591,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 <div className="details-section">
 
                     {/* Title and Price */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
-                        <h1 className="product-title" style={{ fontSize: 'clamp(2rem, 3vw, 2.5rem)', margin: 0 }}>{product.name}</h1>
-                        <div className="product-price" style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '2rem' }}>
+                        <h1 className="product-title" style={{ fontSize: 'clamp(2.5rem, 4.5vw, 3.5rem)', margin: 0, fontWeight: 700 }}>{product.name}</h1>
+                        <div className="product-price" style={{ margin: 0, fontSize: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
                             <span style={{ fontWeight: 600 }}>RS. {sellingPrice.toLocaleString('en-IN')}</span>
                             {hasDiscount && (
                                 <>
@@ -612,7 +612,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     <div className="section-label">
                         <span>DESCRIPTION</span>
                     </div>
-                    <div style={{ color: 'var(--text-secondary)', fontSize: '0.95rem', lineHeight: 1.6, marginBottom: '2.5rem', whiteSpace: 'pre-wrap' }}>
+                    <div style={{ color: 'var(--text-secondary)', fontSize: '1.1rem', lineHeight: 1.75, marginBottom: '2.5rem', whiteSpace: 'pre-wrap' }}>
                         {product.description || 'No description available for this product.'}
                     </div>
 
