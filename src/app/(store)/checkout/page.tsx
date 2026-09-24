@@ -5,15 +5,21 @@ import { useCartStore } from '@/store/cartStore';
 import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
-import { Lock, ArrowLeft } from 'lucide-react';
+import { Lock, ArrowLeft, Tag } from 'lucide-react';
 import Link from 'next/link';
 
 export default function CheckoutPage() {
     const { items, getCartTotal, clearCart } = useCartStore();
     const [mounted, setMounted] = useState(false);
     const [isVerifying, setIsVerifying] = useState(false);
+
+    // Coupon State
+    const [couponCode, setCouponCode] = useState('');
+    const [appliedCoupon, setAppliedCoupon] = useState<{ id: string, code: string, discountValue: number, discountType: 'fixed' | 'percentage' } | null>(null);
+    const [couponError, setCouponError] = useState('');
+    const [verifyingCoupon, setVerifyingCoupon] = useState(false);
 
     // Form State
     const [contact, setContact] = useState({ email: '', phone: '' });
@@ -26,16 +32,58 @@ export default function CheckoutPage() {
         postalCode: ''
     });
 
-    const total = getCartTotal();
+    const subtotal = getCartTotal();
+
+    let discountAmount = 0;
+    if (appliedCoupon) {
+        if (appliedCoupon.discountType === 'fixed') {
+            discountAmount = appliedCoupon.discountValue;
+        } else if (appliedCoupon.discountType === 'percentage') {
+            discountAmount = (subtotal * appliedCoupon.discountValue) / 100;
+        }
+    }
+    const totalToPay = Math.max(0, subtotal - discountAmount);
+
     const router = useRouter();
 
     useEffect(() => {
         setMounted(true);
     }, []);
 
+    const handleApplyCoupon = async () => {
+        const codeToApply = couponCode.trim().toUpperCase();
+        if (!codeToApply) return;
+        setVerifyingCoupon(true);
+        setCouponError('');
+        try {
+            const q = query(collection(db, 'coupons'), where('code', '==', codeToApply));
+            const querySnapshot = await getDocs(q);
+            if (querySnapshot.empty) {
+                setCouponError('Invalid coupon code.');
+                setAppliedCoupon(null);
+            } else {
+                const doc = querySnapshot.docs[0];
+                const data = doc.data();
+                if (!data.active) {
+                    setCouponError('This coupon has expired.');
+                    setAppliedCoupon(null);
+                } else {
+                    setAppliedCoupon({ id: doc.id, code: data.code, discountValue: parseFloat(data.discountValue), discountType: data.discountType });
+                    setCouponError('');
+                }
+            }
+        } catch (error) {
+            console.error("Error verifying coupon", error);
+            setCouponError('Error verifying coupon.');
+        } finally {
+            setVerifyingCoupon(false);
+        }
+    };
+
     const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (total <= 0) return;
+        // Allow checkout if free (e.g. 100% coupon) but items must exist
+        if (items.length === 0) return;
         setIsVerifying(true);
 
         const customerName = `${address.firstName} ${address.lastName}`.trim();
@@ -46,7 +94,10 @@ export default function CheckoutPage() {
                 const cleanOrderData = JSON.parse(JSON.stringify({
                     orderId: paymentId,
                     items: items,
-                    totalAmount: total,
+                    subtotal: subtotal,
+                    discountAmount: discountAmount,
+                    couponApplied: appliedCoupon ? appliedCoupon.code : null,
+                    totalAmount: totalToPay,
                     status: 'Processing',
                     customerName: customerName,
                     customerEmail: contact.email,
@@ -62,10 +113,20 @@ export default function CheckoutPage() {
         };
 
         try {
+            // Free orders (100% discount) skip razorpay
+            if (totalToPay === 0) {
+                await saveOrderToFirebase('free_' + Date.now());
+                alert("Order placed successfully!");
+                clearCart();
+                setIsVerifying(false);
+                router.push('/');
+                return;
+            }
+
             const res = await fetch('/api/create-order', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: total })
+                body: JSON.stringify({ amount: totalToPay })
             });
             const order = await res.json();
 
@@ -276,7 +337,36 @@ export default function CheckoutPage() {
                     <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '2rem', position: 'sticky', top: '100px' }}>
                         <h3 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem' }}>Order Summary</h3>
 
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem', maxHeight: '40vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
+                        {/* Coupon Section */}
+                        <div style={{ marginBottom: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '1.5rem' }}>
+                            <label className="label-clean" style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <Tag size={14} /> Have a coupon?
+                            </label>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="text"
+                                    placeholder="Enter Code"
+                                    value={couponCode}
+                                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                                    className="input-clean"
+                                    style={{ textTransform: 'uppercase', marginBottom: 0 }}
+                                    disabled={!!appliedCoupon || verifyingCoupon}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={appliedCoupon ? () => { setAppliedCoupon(null); setCouponCode('') } : handleApplyCoupon}
+                                    disabled={verifyingCoupon || (!couponCode && !appliedCoupon)}
+                                    className="btn-secondary"
+                                    style={{ padding: '0 1.25rem', whiteSpace: 'nowrap', minHeight: '100%' }}
+                                >
+                                    {verifyingCoupon ? 'Wait' : appliedCoupon ? 'Remove' : 'Apply'}
+                                </button>
+                            </div>
+                            {couponError && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginTop: '0.5rem' }}>{couponError}</p>}
+                            {appliedCoupon && <p style={{ color: '#4ade80', fontSize: '0.85rem', marginTop: '0.5rem' }}>Coupon <strong>{appliedCoupon.code}</strong> applied!</p>}
+                        </div>
+
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem', maxHeight: '35vh', overflowY: 'auto', paddingRight: '0.5rem' }}>
                             {items.map((item) => (
                                 <div key={item.cartItemId} style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
                                     <div style={{ width: '60px', height: '80px', background: 'var(--surface-color)', borderRadius: '4px', overflow: 'hidden', flexShrink: 0 }}>
@@ -298,15 +388,21 @@ export default function CheckoutPage() {
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginBottom: '2rem', fontSize: '0.95rem', borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '1.5rem' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span style={{ color: 'var(--text-secondary)' }}>Subtotal</span>
-                                <span>₹{(Number(total) || 0).toLocaleString()}</span>
+                                <span>₹{(Number(subtotal) || 0).toLocaleString()}</span>
                             </div>
+                            {appliedCoupon && (
+                                <div style={{ display: 'flex', justifyContent: 'space-between', color: '#4ade80' }}>
+                                    <span>Discount ({appliedCoupon.code})</span>
+                                    <span>- ₹{Math.round(discountAmount).toLocaleString()}</span>
+                                </div>
+                            )}
                             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                                 <span style={{ color: 'var(--text-secondary)' }}>Shipping</span>
                                 <span>Free</span>
                             </div>
                             <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid rgba(255,255,255,0.1)', fontWeight: 600, fontSize: '1.25rem' }}>
                                 <span>Total</span>
-                                <span>₹{(Number(total) || 0).toLocaleString()}</span>
+                                <span>₹{Math.round(totalToPay).toLocaleString()}</span>
                             </div>
                         </div>
 
@@ -323,7 +419,7 @@ export default function CheckoutPage() {
                             }}
                         >
                             <Lock size={16} />
-                            {isVerifying ? 'Processing...' : `Pay ₹${total.toLocaleString()}`}
+                            {isVerifying ? 'Processing...' : totalToPay === 0 ? 'Place Free Order' : `Pay ₹${Math.round(totalToPay).toLocaleString()}`}
                         </button>
                     </div>
                 </div>
