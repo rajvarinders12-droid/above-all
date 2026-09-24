@@ -42,7 +42,8 @@ export default function CheckoutPage() {
 
         const saveOrderToFirebase = async (paymentId: string) => {
             try {
-                await addDoc(collection(db, 'orders'), {
+                // Firestore strictly forbids undefined values. Strip any undefined (like missing sizes).
+                const cleanOrderData = JSON.parse(JSON.stringify({
                     orderId: paymentId,
                     items: items,
                     totalAmount: total,
@@ -51,8 +52,10 @@ export default function CheckoutPage() {
                     customerEmail: contact.email,
                     phone: contact.phone,
                     shippingAddress: address,
-                    createdAt: serverTimestamp()
-                });
+                }));
+                cleanOrderData.createdAt = serverTimestamp();
+
+                await addDoc(collection(db, 'orders'), cleanOrderData);
             } catch (e: any) {
                 console.error("Firebase Order Save Error:", e);
                 alert("Database Error: Could not save order. Please check Firebase Firestore Rules! Error: " + (e.message || 'permission denied'));
