@@ -254,15 +254,26 @@ export default function FeaturedProducts() {
 
         querySnapshot.forEach((doc) => {
           const data = doc.data();
+
+          let originalPrice = Number(data.actualPrice || data.price || 0);
+          let sellingPrice = Number(data.discountedPrice) > 0 ? Number(data.discountedPrice) : originalPrice;
+
+          // Auto-correct if user entered the prices backwards in the admin portal
+          if (sellingPrice > originalPrice && originalPrice > 0) {
+            const temp = sellingPrice;
+            sellingPrice = originalPrice;
+            originalPrice = temp;
+          }
+
           fetchedProducts.push({
             id: doc.id,
             name: data.name || 'Unnamed Product',
-            price: data.actualPrice || data.price || 0, // fallback for old data
+            price: originalPrice,
             imageUrl: data.mainImageUrl || data.imageUrl || '',
             mainImageUrl: data.mainImageUrl || data.imageUrl || '',
             variants: data.variants || [],
-            actualPrice: data.actualPrice || 0,
-            discountedPrice: data.discountedPrice || 0,
+            actualPrice: originalPrice,
+            discountedPrice: sellingPrice !== originalPrice ? sellingPrice : 0,
             inStock: data.inStock || 0
           });
         });
