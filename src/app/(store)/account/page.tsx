@@ -3,7 +3,8 @@
 import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { auth } from '@/lib/firebase';
+import { collection, query, where, getDocs, orderBy } from 'firebase/firestore';
+import { auth, db } from '@/lib/firebase';
 import Link from 'next/link';
 import { LogOut, Package, User } from 'lucide-react';
 
@@ -11,7 +12,8 @@ export default function AccountPage() {
     const { user, loading, initialize } = useAuthStore();
     const router = useRouter();
     const [mounted, setMounted] = useState(false);
-    const [orders, setOrders] = useState([]); // Assuming no orders for now to trigger the empty state
+    const [orders, setOrders] = useState<any[]>([]);
+    const [loadingOrders, setLoadingOrders] = useState(true);
 
     useEffect(() => {
         setMounted(true);
@@ -19,8 +21,30 @@ export default function AccountPage() {
     }, [initialize]);
 
     useEffect(() => {
-        if (!loading && mounted && !user) {
-            router.push('/login');
+        if (!loading && mounted) {
+            if (!user) {
+                router.push('/login');
+            } else {
+                // Fetch orders for user
+                const fetchOrders = async () => {
+                    try {
+                        const q = query(collection(db, 'orders'), where('customerEmail', '==', user.email));
+                        const querySnapshot = await getDocs(q);
+                        const fetchedOrders: any[] = [];
+                        querySnapshot.forEach((doc) => {
+                            fetchedOrders.push({ id: doc.id, ...doc.data() });
+                        });
+                        // Soft sort client side since we don't have a composed index
+                        fetchedOrders.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+                        setOrders(fetchedOrders);
+                    } catch (error) {
+                        console.error('Error fetching orders:', error);
+                    } finally {
+                        setLoadingOrders(false);
+                    }
+                };
+                fetchOrders();
+            }
         }
     }, [user, loading, router, mounted]);
 
@@ -90,9 +114,46 @@ export default function AccountPage() {
                             <Package size={16} /> ORDER HISTORY
                         </h3>
 
-                        {orders.length > 0 ? (
-                            <div>
-                                {/* Render orders here when backend is connected */}
+                        {loadingOrders ? (
+                            <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>Loading orders...</div>
+                        ) : orders.length > 0 ? (
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                                {orders.map(order => (
+                                    <div key={order.id} style={{ backgroundColor: '#09090b', padding: '1.5rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                            <div>
+                                                <div style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.05em' }}>Order #{order.orderId || order.id.slice(0, 8).toUpperCase()}</div>
+                                                <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.2rem' }}>
+                                                    {order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleDateString() : 'Recent'}
+                                                </div>
+                                            </div>
+                                            <div style={{ textAlign: 'right' }}>
+                                                <div style={{ fontSize: '1rem', fontWeight: 600 }}>₹{parseFloat(order.totalAmount || 0).toLocaleString()}</div>
+                                                <div style={{
+                                                    fontSize: '0.75rem', marginTop: '0.2rem', padding: '0.2rem 0.5rem', borderRadius: '4px',
+                                                    backgroundColor: order.status === 'Processing' ? 'rgba(250, 204, 21, 0.1)' : order.status === 'Shipped' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(74, 222, 128, 0.1)',
+                                                    color: order.status === 'Processing' ? '#facc15' : order.status === 'Shipped' ? '#38bdf8' : '#4ade80',
+                                                    display: 'inline-block'
+                                                }}>
+                                                    {order.status || 'Processing'}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                            {order.items?.map((item: any, idx: number) => (
+                                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                                                    <div style={{ width: '50px', height: '65px', background: '#222', borderRadius: '4px', overflow: 'hidden' }}>
+                                                        {item.imageUrl && <img src={item.imageUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />}
+                                                    </div>
+                                                    <div style={{ flex: 1 }}>
+                                                        <div style={{ fontSize: '0.9rem' }}>{item.name}</div>
+                                                        <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)' }}>Qty: {item.quantity} {item.size && `| Size: ${item.size}`}</div>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                ))}
                             </div>
                         ) : (
                             <div style={{

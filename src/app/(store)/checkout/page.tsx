@@ -6,9 +6,10 @@ import Navbar from '@/components/Navbar';
 import { useRouter } from 'next/navigation';
 import Script from 'next/script';
 import { collection, addDoc, serverTimestamp, getDocs, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
-import { Lock, ArrowLeft, Tag } from 'lucide-react';
+import { db, auth } from '@/lib/firebase';
+import { Lock, ArrowLeft, Tag, LogIn } from 'lucide-react';
 import Link from 'next/link';
+import { onAuthStateChanged, User } from 'firebase/auth';
 
 export default function CheckoutPage() {
     const { items, getCartTotal, clearCart } = useCartStore();
@@ -20,6 +21,10 @@ export default function CheckoutPage() {
     const [appliedCoupon, setAppliedCoupon] = useState<{ id: string, code: string, discountValue: number, discountType: 'fixed' | 'percentage' } | null>(null);
     const [couponError, setCouponError] = useState('');
     const [verifyingCoupon, setVerifyingCoupon] = useState(false);
+
+    // Auth State
+    const [user, setUser] = useState<User | null>(null);
+    const [authLoading, setAuthLoading] = useState(true);
 
     // Form State
     const [contact, setContact] = useState({ email: '', phone: '' });
@@ -48,6 +53,14 @@ export default function CheckoutPage() {
 
     useEffect(() => {
         setMounted(true);
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            setUser(currentUser);
+            if (currentUser && currentUser.email) {
+                setContact(prev => ({ ...prev, email: currentUser.email as string }));
+            }
+            setAuthLoading(false);
+        });
+        return () => unsubscribe();
     }, []);
 
     const handleApplyCoupon = async () => {
@@ -119,7 +132,7 @@ export default function CheckoutPage() {
                 alert("Order placed successfully!");
                 clearCart();
                 setIsVerifying(false);
-                router.push('/');
+                router.push('/account'); // redirect to account instead of root
                 return;
             }
 
@@ -157,7 +170,7 @@ export default function CheckoutPage() {
                     await saveOrderToFirebase(response.razorpay_order_id || 'manual');
                     alert("Payment successful! Your order has been placed.");
                     clearCart();
-                    router.push('/');
+                    router.push('/account');
                 },
                 prefill: {
                     name: customerName,
@@ -184,7 +197,7 @@ export default function CheckoutPage() {
         }
     };
 
-    if (!mounted) return <main style={{ minHeight: '100vh', background: 'var(--bg-color)' }}><Navbar /></main>;
+    if (!mounted || authLoading) return <main style={{ minHeight: '100vh', background: 'var(--bg-color)' }}><Navbar /></main>;
 
     if (items.length === 0) {
         return (
@@ -228,110 +241,130 @@ export default function CheckoutPage() {
                 `}} />
                 <div className="checkout-grid">
                     {/* Left Column: Forms */}
-                    <form id="checkout-form" onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
 
-                        {/* Contact Information */}
-                        <section>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-                                1. Contact Information
-                            </h2>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
-                                <div>
-                                    <label className="label-clean">Email Address</label>
-                                    <input
-                                        type="email"
-                                        required
-                                        className="input-clean"
-                                        placeholder="you@example.com"
-                                        value={contact.email}
-                                        onChange={(e) => setContact({ ...contact, email: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label-clean">Phone Number</label>
-                                    <input
-                                        type="tel"
-                                        required
-                                        className="input-clean"
-                                        placeholder="+91 9876543210"
-                                        value={contact.phone}
-                                        onChange={(e) => setContact({ ...contact, phone: e.target.value })}
-                                    />
-                                </div>
+                    {!user ? (
+                        <div className="clean-panel" style={{ padding: '3rem 2rem', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1.5rem', background: 'rgba(255,255,255,0.02)' }}>
+                            <div style={{ width: '64px', height: '64px', borderRadius: '50%', background: 'rgba(255,255,255,0.05)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                                <Lock size={28} color="var(--text-secondary)" />
                             </div>
-                        </section>
-
-                        {/* Shipping Address */}
-                        <section>
-                            <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-                                2. Shipping Address
-                            </h2>
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                                <div>
-                                    <label className="label-clean">First Name</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="input-clean"
-                                        value={address.firstName}
-                                        onChange={(e) => setAddress({ ...address, firstName: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label-clean">Last Name</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="input-clean"
-                                        value={address.lastName}
-                                        onChange={(e) => setAddress({ ...address, lastName: e.target.value })}
-                                    />
-                                </div>
-                                <div style={{ gridColumn: '1 / -1' }}>
-                                    <label className="label-clean">Address Label / Street</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="input-clean"
-                                        placeholder="Apartment, suite, etc. & Street Address"
-                                        value={address.addressLine1}
-                                        onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
-                                    />
-                                </div>
-                                <div style={{ gridColumn: '1 / -1' }}>
-                                    <label className="label-clean">City</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="input-clean"
-                                        value={address.city}
-                                        onChange={(e) => setAddress({ ...address, city: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label-clean">State / Province</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="input-clean"
-                                        value={address.state}
-                                        onChange={(e) => setAddress({ ...address, state: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="label-clean">Postal Code</label>
-                                    <input
-                                        type="text"
-                                        required
-                                        className="input-clean"
-                                        value={address.postalCode}
-                                        onChange={(e) => setAddress({ ...address, postalCode: e.target.value })}
-                                    />
-                                </div>
+                            <div>
+                                <h2 style={{ fontSize: '1.5rem', fontWeight: 600, marginBottom: '0.5rem' }}>Login Required</h2>
+                                <p style={{ color: 'var(--text-secondary)', maxWidth: '400px', margin: '0 auto', lineHeight: '1.5' }}>
+                                    You must be logged in to place an order. Create an account or log in to continue with your secure checkout.
+                                </p>
                             </div>
-                        </section>
+                            <Link href={`/login?redirect=/checkout`} className="btn-primary" style={{ padding: '1rem 3rem', fontSize: '1rem', marginTop: '1rem', display: 'inline-flex', alignItems: 'center', gap: '0.75rem' }}>
+                                <LogIn size={18} /> Login / Sign Up Now
+                            </Link>
+                        </div>
+                    ) : (
+                        <form id="checkout-form" onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
 
-                    </form>
+                            {/* Contact Information */}
+                            <section>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                                    1. Contact Information
+                                </h2>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label className="label-clean">Email Address (Locked)</label>
+                                        <input
+                                            type="email"
+                                            required
+                                            className="input-clean"
+                                            placeholder="you@example.com"
+                                            value={contact.email}
+                                            disabled
+                                            style={{ opacity: 0.7, cursor: 'not-allowed', background: 'rgba(255,255,255,0.05)' }}
+                                        />
+                                        <p style={{ fontSize: '0.8rem', color: 'var(--text-tertiary)', marginTop: '0.5rem' }}>Email is tied to your account and cannot be changed.</p>
+                                    </div>
+                                    <div>
+                                        <label className="label-clean">Phone Number</label>
+                                        <input
+                                            type="tel"
+                                            required
+                                            className="input-clean"
+                                            placeholder="+91 9876543210"
+                                            value={contact.phone}
+                                            onChange={(e) => setContact({ ...contact, phone: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+
+                            {/* Shipping Address */}
+                            <section>
+                                <h2 style={{ fontSize: '1.25rem', fontWeight: 600, marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
+                                    2. Shipping Address
+                                </h2>
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                                    <div>
+                                        <label className="label-clean">First Name</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="input-clean"
+                                            value={address.firstName}
+                                            onChange={(e) => setAddress({ ...address, firstName: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="label-clean">Last Name</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="input-clean"
+                                            value={address.lastName}
+                                            onChange={(e) => setAddress({ ...address, lastName: e.target.value })}
+                                        />
+                                    </div>
+                                    <div style={{ gridColumn: '1 / -1' }}>
+                                        <label className="label-clean">Address Label / Street</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="input-clean"
+                                            placeholder="Apartment, suite, etc. & Street Address"
+                                            value={address.addressLine1}
+                                            onChange={(e) => setAddress({ ...address, addressLine1: e.target.value })}
+                                        />
+                                    </div>
+                                    <div style={{ gridColumn: '1 / -1' }}>
+                                        <label className="label-clean">City</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="input-clean"
+                                            value={address.city}
+                                            onChange={(e) => setAddress({ ...address, city: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="label-clean">State / Province</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="input-clean"
+                                            value={address.state}
+                                            onChange={(e) => setAddress({ ...address, state: e.target.value })}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="label-clean">Postal Code</label>
+                                        <input
+                                            type="text"
+                                            required
+                                            className="input-clean"
+                                            value={address.postalCode}
+                                            onChange={(e) => setAddress({ ...address, postalCode: e.target.value })}
+                                        />
+                                    </div>
+                                </div>
+                            </section>
+
+                        </form>
+                    )}
 
                     {/* Right Column: Order Summary */}
                     <div style={{ background: 'rgba(255,255,255,0.02)', border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '2rem', position: 'sticky', top: '100px' }}>
@@ -409,17 +442,19 @@ export default function CheckoutPage() {
                         <button
                             type="submit"
                             form="checkout-form"
-                            disabled={isVerifying}
+                            disabled={isVerifying || !user}
                             style={{
                                 width: '100%', padding: '1.25rem', background: 'var(--text-primary)', color: 'var(--bg-color)',
                                 border: 'none', borderRadius: '6px', fontSize: '0.95rem', fontWeight: 600, letterSpacing: '0.1em',
-                                textTransform: 'uppercase', cursor: isVerifying ? 'wait' : 'pointer',
+                                textTransform: 'uppercase', cursor: (isVerifying || !user) ? 'not-allowed' : 'pointer',
                                 display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.75rem',
-                                transition: 'background 0.2s'
+                                transition: 'background 0.2s', opacity: (!user || isVerifying) ? 0.5 : 1
                             }}
                         >
                             <Lock size={16} />
-                            {isVerifying ? 'Processing...' : totalToPay === 0 ? 'Place Free Order' : `Pay ₹${Math.round(totalToPay).toLocaleString()}`}
+                            {!user ? 'Login Required' : (
+                                isVerifying ? 'Processing...' : totalToPay === 0 ? 'Place Free Order' : `Pay ₹${Math.round(totalToPay).toLocaleString()}`
+                            )}
                         </button>
                     </div>
                 </div>

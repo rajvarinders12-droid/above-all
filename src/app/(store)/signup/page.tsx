@@ -1,10 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
+import Navbar from '@/components/Navbar';
 
 export default function SignupPage() {
     const [name, setName] = useState('');
@@ -13,7 +15,11 @@ export default function SignupPage() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirectUrl = searchParams.get('redirect') || '/';
 
     const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -41,7 +47,7 @@ export default function SignupPage() {
             if (['admin@above-all.com', 'admin2@above-all.com'].includes(email)) {
                 router.push('/admin');
             } else {
-                router.push('/');
+                router.push(redirectUrl);
             }
         } catch (err: any) {
             setError(err.message || 'Failed to create an account');
@@ -51,82 +57,100 @@ export default function SignupPage() {
     };
 
     return (
-        <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', paddingTop: '100px', backgroundColor: '#000000', color: '#ffffff' }}>
-            <div style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
-                <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', marginBottom: '2rem', textAlign: 'center', fontWeight: '400' }}>CREATE ACCOUNT</h1>
+        <main style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-color)' }}>
+            <Navbar />
+            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '120px 20px 60px', color: 'var(--text-primary)' }}>
+                <div style={{ width: '100%', maxWidth: '420px' }}>
+                    <div className="clean-panel" style={{ padding: '3rem 2rem', display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                        <div style={{ textAlign: 'center' }}>
+                            <h1 style={{ fontFamily: 'var(--font-serif)', fontSize: '2rem', letterSpacing: '0.05em', marginBottom: '0.5rem', fontWeight: '400' }}>Create Account</h1>
+                            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Join ABOVA and elevate your wardrobe</p>
+                        </div>
 
-                {error && (
-                    <div style={{ backgroundColor: 'rgba(255,0,0,0.1)', color: '#ff4444', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.8rem', borderLeft: '2px solid #ff4444' }}>
-                        {error}
+                        {error && (
+                            <div style={{ backgroundColor: 'rgba(239, 68, 68, 0.1)', color: '#ef4444', padding: '1rem', fontSize: '0.85rem', borderRadius: '4px', border: '1px solid rgba(239, 68, 68, 0.3)', textAlign: 'center' }}>
+                                {error}
+                            </div>
+                        )}
+
+                        <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="label-clean">Full Name</label>
+                                <input
+                                    type="text"
+                                    required
+                                    className="input-clean"
+                                    placeholder="Enter your name"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="label-clean">Email Address</label>
+                                <input
+                                    type="email"
+                                    required
+                                    className="input-clean"
+                                    placeholder="Enter your email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="label-clean">Password</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        required
+                                        className="input-clean"
+                                        placeholder="Create a password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        style={{ paddingRight: '40px' }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', color: 'var(--text-tertiary)', cursor: 'pointer', padding: '4px' }}
+                                    >
+                                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <label className="label-clean">Confirm Password</label>
+                                <div style={{ position: 'relative' }}>
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        required
+                                        className="input-clean"
+                                        placeholder="Confirm your password"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        style={{ paddingRight: '40px' }}
+                                    />
+                                </div>
+                            </div>
+
+                            <button
+                                type="submit"
+                                disabled={loading}
+                                className="btn-primary"
+                                style={{ padding: '1rem', fontSize: '0.9rem', marginTop: '1rem', width: '100%' }}
+                            >
+                                {loading ? 'Creating Account...' : 'Create Account'}
+                            </button>
+                        </form>
+
+                        <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
+                            Already have an account? <Link href={`/login${redirectUrl !== '/' ? `?redirect=${encodeURIComponent(redirectUrl)}` : ''}`} style={{ color: 'var(--text-primary)', textDecoration: 'underline' }}>Sign in</Link>
+                        </div>
                     </div>
-                )}
-
-                <form onSubmit={handleSignup} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.75rem', letterSpacing: '0.1em', opacity: 0.7 }}>FULL NAME</label>
-                        <input
-                            type="text"
-                            required
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            style={{ background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.2)', padding: '0.75rem 0', color: 'white', outline: 'none', transition: 'border-color 0.3s' }}
-                            onFocus={(e) => e.target.style.borderBottom = '1px solid white'}
-                            onBlur={(e) => e.target.style.borderBottom = '1px solid rgba(255,255,255,0.2)'}
-                        />
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.75rem', letterSpacing: '0.1em', opacity: 0.7 }}>EMAIL ADDRESS</label>
-                        <input
-                            type="email"
-                            required
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            style={{ background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.2)', padding: '0.75rem 0', color: 'white', outline: 'none', transition: 'border-color 0.3s' }}
-                            onFocus={(e) => e.target.style.borderBottom = '1px solid white'}
-                            onBlur={(e) => e.target.style.borderBottom = '1px solid rgba(255,255,255,0.2)'}
-                        />
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.75rem', letterSpacing: '0.1em', opacity: 0.7 }}>PASSWORD</label>
-                        <input
-                            type="password"
-                            required
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            style={{ background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.2)', padding: '0.75rem 0', color: 'white', outline: 'none', transition: 'border-color 0.3s' }}
-                            onFocus={(e) => e.target.style.borderBottom = '1px solid white'}
-                            onBlur={(e) => e.target.style.borderBottom = '1px solid rgba(255,255,255,0.2)'}
-                        />
-                    </div>
-
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                        <label style={{ fontSize: '0.75rem', letterSpacing: '0.1em', opacity: 0.7 }}>CONFIRM PASSWORD</label>
-                        <input
-                            type="password"
-                            required
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            style={{ background: 'transparent', border: 'none', borderBottom: '1px solid rgba(255,255,255,0.2)', padding: '0.75rem 0', color: 'white', outline: 'none', transition: 'border-color 0.3s' }}
-                            onFocus={(e) => e.target.style.borderBottom = '1px solid white'}
-                            onBlur={(e) => e.target.style.borderBottom = '1px solid rgba(255,255,255,0.2)'}
-                        />
-                    </div>
-
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        style={{ background: 'white', color: 'black', padding: '1rem', border: 'none', marginTop: '1rem', cursor: loading ? 'not-allowed' : 'pointer', fontSize: '0.8rem', letterSpacing: '0.2em', textTransform: 'uppercase', transition: 'background 0.3s', opacity: loading ? 0.7 : 1 }}
-                    >
-                        {loading ? 'Processing...' : 'Create Account'}
-                    </button>
-
-                    <div style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.8rem', opacity: 0.7 }}>
-                        Already have an account? <Link href="/login" style={{ color: 'white', textDecoration: 'underline' }}>Sign in</Link>
-                    </div>
-                </form>
+                </div>
             </div>
-        </div>
+        </main>
     );
 }
