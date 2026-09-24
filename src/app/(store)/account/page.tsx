@@ -120,23 +120,15 @@ export default function AccountPage() {
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                                 {orders.map(order => (
                                     <div key={order.id} style={{ backgroundColor: '#09090b', padding: '1.5rem', borderRadius: '4px', border: '1px solid rgba(255,255,255,0.1)' }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-start', marginBottom: '1rem', paddingBottom: '1rem', borderBottom: '1px solid rgba(255,255,255,0.1)' }}>
                                             <div>
-                                                <div style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.05em' }}>Order #{order.orderId || order.id.slice(0, 8).toUpperCase()}</div>
+                                                <div style={{ fontSize: '1rem', fontWeight: 500, letterSpacing: '0.05em', wordBreak: 'break-all' }}>ORDER #{String(order.orderId || order.id).slice(0, 12).toUpperCase()}</div>
                                                 <div style={{ fontSize: '0.8rem', color: 'rgba(255,255,255,0.5)', marginTop: '0.2rem' }}>
                                                     {order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleDateString() : 'Recent'}
                                                 </div>
                                             </div>
                                             <div style={{ textAlign: 'right' }}>
                                                 <div style={{ fontSize: '1rem', fontWeight: 600 }}>₹{parseFloat(order.totalAmount || 0).toLocaleString()}</div>
-                                                <div style={{
-                                                    fontSize: '0.75rem', marginTop: '0.2rem', padding: '0.2rem 0.5rem', borderRadius: '4px',
-                                                    backgroundColor: order.status === 'Processing' ? 'rgba(250, 204, 21, 0.1)' : order.status === 'Shipped' ? 'rgba(56, 189, 248, 0.1)' : 'rgba(74, 222, 128, 0.1)',
-                                                    color: order.status === 'Processing' ? '#facc15' : order.status === 'Shipped' ? '#38bdf8' : '#4ade80',
-                                                    display: 'inline-block'
-                                                }}>
-                                                    {order.status || 'Processing'}
-                                                </div>
                                             </div>
                                         </div>
                                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

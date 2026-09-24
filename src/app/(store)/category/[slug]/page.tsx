@@ -139,16 +139,6 @@ function ProductCardItem({ product }: { product: Product }) {
                         RS. {(product.price || 0).toLocaleString('en-IN')}
                     </p>
                 </Link>
-                <div
-                    style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer', padding: '4px' }}
-                    onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setIsQuickViewOpen(true);
-                    }}
-                >
-                    <Plus size={20} strokeWidth={1.5} color="#ffffff" style={{ marginTop: '2px' }} />
-                </div>
             </div>
 
             {isQuickViewOpen && <QuickViewModal product={product as any} onClose={() => setIsQuickViewOpen(false)} />}
