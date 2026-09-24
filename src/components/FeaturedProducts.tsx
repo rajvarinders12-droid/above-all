@@ -22,6 +22,40 @@ interface Product {
 function ProductCardItem({ product }: { product: Product }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isQuickViewOpen, setIsQuickViewOpen] = useState(false);
+  const [currentIdx, setCurrentIdx] = useState(0);
+
+  // Collect all unique images
+  const images = Array.from(new Set([
+    product.mainImageUrl || product.imageUrl,
+    ...(product.variants?.map((v: any) => v.imageUrl).filter(Boolean) || [])
+  ])).filter(Boolean);
+
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+
+  const handleNext = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (currentIdx < images.length - 1) setCurrentIdx(currentIdx + 1);
+  };
+
+  const handlePrev = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (currentIdx > 0) setCurrentIdx(currentIdx - 1);
+  };
+
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.touches[0].clientX);
+  };
+
+  const onTouchEnd = (e: React.TouchEvent) => {
+    if (!touchStart) return;
+    const touchEnd = e.changedTouches[0].clientX;
+    const delta = touchStart - touchEnd;
+    if (delta > 40) handleNext(e); // Swiped left -> next image
+    if (delta < -40) handlePrev(e); // Swiped right -> prev image
+    setTouchStart(null);
+  };
 
   return (
     <div
@@ -43,18 +77,28 @@ function ProductCardItem({ product }: { product: Product }) {
           position: 'relative',
           borderRadius: '16px',
           overflow: 'hidden',
-        }}>
-          {product.imageUrl ? (
-            <div style={{
-              width: '100%',
-              height: '100%',
-              backgroundImage: `url('${product.imageUrl}')`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundRepeat: 'no-repeat',
-              transition: 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-              transform: isHovered ? 'scale(1.03)' : 'scale(1)',
-            }} />
+        }}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
+          {images.length > 0 ? (
+            images.map((img, idx) => (
+              <div key={idx} style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundImage: `url('${img}')`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+                transition: 'opacity 0.4s ease, transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
+                transform: isHovered ? 'scale(1.03)' : 'scale(1)',
+                opacity: currentIdx === idx ? 1 : 0,
+                zIndex: currentIdx === idx ? 1 : 0,
+              }} />
+            ))
           ) : (
             <div style={{
               width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#333'
@@ -64,63 +108,81 @@ function ProductCardItem({ product }: { product: Product }) {
           )}
 
           {/* Carousel Arrows (Visual only for now, visible on hover) */}
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: '12px',
-            transform: 'translateY(-50%)',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            opacity: isHovered ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-            zIndex: 10,
-          }}>
-            <ChevronLeft size={20} />
-          </div>
+          {images.length > 1 && currentIdx > 0 && (
+            <div
+              className="carousel-arrow"
+              onClick={handlePrev}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                left: '12px',
+                transform: 'translateY(-50%)',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(8px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                opacity: isHovered ? 1 : 0,
+                transition: 'opacity 0.3s ease',
+                zIndex: 10,
+              }}>
+              <ChevronLeft size={20} />
+            </div>
+          )}
 
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            right: '12px',
-            transform: 'translateY(-50%)',
-            width: '36px',
-            height: '36px',
-            borderRadius: '50%',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            backdropFilter: 'blur(8px)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            opacity: isHovered ? 1 : 0,
-            transition: 'opacity 0.3s ease',
-            zIndex: 10,
-          }}>
-            <ChevronRight size={20} />
-          </div>
+          {images.length > 1 && currentIdx < images.length - 1 && (
+            <div
+              className="carousel-arrow"
+              onClick={handleNext}
+              style={{
+                position: 'absolute',
+                top: '50%',
+                right: '12px',
+                transform: 'translateY(-50%)',
+                width: '36px',
+                height: '36px',
+                borderRadius: '50%',
+                backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                backdropFilter: 'blur(8px)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                opacity: isHovered ? 1 : 0,
+                transition: 'opacity 0.3s ease',
+                zIndex: 10,
+              }}>
+              <ChevronRight size={20} />
+            </div>
+          )}
 
           {/* Pagination Dots */}
-          <div style={{
-            position: 'absolute',
-            bottom: '16px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            zIndex: 10,
-          }}>
-            <div style={{ width: '6px', height: '6px', borderRadius: '50%', backgroundColor: '#ffffff' }} />
-            <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.4)' }} />
-            <div style={{ width: '4px', height: '4px', borderRadius: '50%', backgroundColor: 'rgba(255,255,255,0.4)' }} />
-          </div>
+          {images.length > 1 && (
+            <div style={{
+              position: 'absolute',
+              bottom: '16px',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              zIndex: 10,
+            }}>
+              {images.map((_, idx) => (
+                <div key={idx} style={{
+                  width: currentIdx === idx ? '6px' : '4px',
+                  height: currentIdx === idx ? '6px' : '4px',
+                  borderRadius: '50%',
+                  backgroundColor: currentIdx === idx ? '#ffffff' : 'rgba(255,255,255,0.4)',
+                  transition: 'all 0.3s ease'
+                }} />
+              ))}
+            </div>
+          )}
         </div>
       </Link>
 
@@ -204,10 +266,21 @@ export default function FeaturedProducts() {
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-      {products.map((product) => (
-        <ProductCardItem key={product.id} product={product} />
-      ))}
-    </div>
+    <>
+      <style dangerouslySetInnerHTML={{
+        __html: `
+        @media (max-width: 768px) {
+          .carousel-arrow {
+            display: none !important;
+          }
+        }
+        `
+      }} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+        {products.map((product) => (
+          <ProductCardItem key={product.id} product={product} />
+        ))}
+      </div>
+    </>
   );
 }
