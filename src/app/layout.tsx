@@ -19,14 +19,6 @@ export const metadata: Metadata = {
     description: 'Three foundations. Endless combinations.',
     url: 'https://theabova.com',
     siteName: 'ABOVA',
-    images: [
-      {
-        url: '/abova-logo.png',
-        width: 800,
-        height: 800,
-        alt: 'ABOVA | Above All',
-      },
-    ],
     locale: 'en_US',
     type: 'website',
   },
@@ -34,7 +26,6 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ABOVA | Above All',
     description: 'Three foundations. Endless combinations.',
-    images: ['/abova-logo.png'],
   },
 };
 
