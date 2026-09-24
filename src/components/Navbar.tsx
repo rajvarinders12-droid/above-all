@@ -137,8 +137,11 @@ export default function Navbar() {
                     <span style={{ transition: 'opacity 0.3s' }}>{menuOpen ? 'CLOSE' : 'MENU'}</span>
                 </div>
 
+                {/* Splash Reveal Overlay */}
+                <div className="splash-overlay" />
+
                 {/* Logo */}
-                <div style={{ zIndex: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+                <div className="logo-anim-wrapper" style={{ zIndex: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', position: 'absolute', left: '50%' }}>
                     <Link href="/" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Image
                             src="/abova-logo.png"
@@ -426,6 +429,45 @@ export default function Navbar() {
                 }
                 .menu-link-hover:hover {
                     color: var(--text-secondary) !important;
+                }
+                
+                /* Splash Screen Reveal Animation */
+                .splash-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100vh;
+                    background-color: #000000;
+                    z-index: 55;
+                    animation: splashFade 2.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+                }
+
+                .logo-anim-wrapper {
+                    animation: splashLogo 2.5s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+                }
+
+                @keyframes splashFade {
+                    0% { opacity: 1; pointer-events: auto; }
+                    40% { opacity: 1; pointer-events: auto; }
+                    90% { opacity: 0; visibility: hidden; pointer-events: none; }
+                    100% { opacity: 0; visibility: hidden; pointer-events: none; }
+                }
+
+                @keyframes splashLogo {
+                    0% { transform: translate(-50%, 45vh) scale(3.5); }
+                    30% { transform: translate(-50%, 45vh) scale(3.5); }
+                    90% { transform: translate(-50%, 0) scale(1); }
+                    100% { transform: translate(-50%, 0) scale(1); }
+                }
+
+                @media (max-width: 768px) {
+                    @keyframes splashLogo {
+                        0% { transform: translate(-50%, 40vh) scale(2); }
+                        30% { transform: translate(-50%, 40vh) scale(2); }
+                        90% { transform: translate(-50%, 0) scale(1); }
+                        100% { transform: translate(-50%, 0) scale(1); }
+                    }
                 }
                 .menu-sublink {
                     color: var(--text-tertiary);
