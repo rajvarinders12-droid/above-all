@@ -13,6 +13,29 @@ const integralCF = localFont({
 export const metadata: Metadata = {
   title: 'ABOVA | Above All',
   description: 'Three foundations. Endless combinations.',
+  metadataBase: new URL('https://theabova.com'),
+  openGraph: {
+    title: 'ABOVA | Above All',
+    description: 'Three foundations. Endless combinations.',
+    url: 'https://theabova.com',
+    siteName: 'ABOVA',
+    images: [
+      {
+        url: '/abova-logo.png',
+        width: 800,
+        height: 800,
+        alt: 'ABOVA | Above All',
+      },
+    ],
+    locale: 'en_US',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ABOVA | Above All',
+    description: 'Three foundations. Endless combinations.',
+    images: ['/abova-logo.png'],
+  },
 };
 
 export default function RootLayout({
