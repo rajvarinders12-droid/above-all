@@ -53,7 +53,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         );
     }
 
-    const orderDate = order.createdAt ? new Date(order.createdAt.seconds * 1000).toLocaleString() : 'Date Unavailable';
+    const orderDate = order.createdAt?.seconds ? new Date(order.createdAt.seconds * 1000).toLocaleString() : (order.createdAt?.toDate ? order.createdAt.toDate().toLocaleString() : 'Date Unavailable');
     const totalItems = order.items?.reduce((sum: number, item: any) => sum + (item.quantity || 1), 0) || 0;
 
     return (
