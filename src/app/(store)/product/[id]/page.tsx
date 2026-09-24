@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, use } from 'react';
-import { doc, getDoc } from 'firebase/firestore';
+import { useEffect, useState, use, useRef } from 'react';
+import { doc, getDoc, collection, getDocs, query } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
 import Link from 'next/link';
@@ -56,8 +56,44 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         .map(img => (img.includes('.heic') || img.includes('.HEIC')) && !img.includes('f_auto') ? img.replace('/upload/', '/upload/f_auto,q_auto/') : img)
     )) : [];
 
+    const [recommendations, setRecommendations] = useState<any[]>([]);
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const [scrollProgress, setScrollProgress] = useState(0);
+
+    const handleScroll = (e: any) => {
+        const el = e.currentTarget;
+        const scrollMax = el.scrollWidth - el.clientWidth;
+        if (scrollMax > 0) {
+            setScrollProgress((el.scrollLeft / scrollMax) * 100);
+        }
+    };
+
     // Fallback for cartStore
     const addItem = useCartStore(state => (state as any).addItem || (() => { }));
+
+    useEffect(() => {
+        async function fetchRecs() {
+            try {
+                const q = query(collection(db, 'products'));
+                const querySnapshot = await getDocs(q);
+                let prods: any[] = [];
+                querySnapshot.forEach((docSnap) => {
+                    if (docSnap.id !== resolvedParams.id) {
+                        const d = docSnap.data();
+                        prods.push({ id: docSnap.id, name: d.name, price: d.actualPrice || d.price || 0, imageUrl: d.mainImageUrl || d.imageUrl || '' });
+                    }
+                });
+                for (let i = prods.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [prods[i], prods[j]] = [prods[j], prods[i]];
+                }
+                setRecommendations(prods.slice(0, 4));
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        fetchRecs();
+    }, [resolvedParams.id]);
 
     useEffect(() => {
         async function fetchProduct() {
@@ -449,12 +485,25 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     to { opacity: 1; transform: translateY(0); }
                 }
 
+                .rec-card {
+                    width: calc(25% - 0.75rem);
+                }
+                .progress-bar-container {
+                    display: none;
+                }
+
                 @media (max-width: 1024px) {
                     .details-section { padding: 3rem 5%; }
                     .action-buttons { grid-template-columns: 1fr; }
                 }
 
                 @media (max-width: 768px) {
+                    .rec-card {
+                        width: 45%;
+                    }
+                    .progress-bar-container {
+                        display: block;
+                    }
                     .premium-product-layout {
                         display: flex;
                         flex-direction: column;
@@ -735,6 +784,39 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                 </div>
             </div>
+
+            {/* Recommendations / Top Picks */}
+            {recommendations.length > 0 && (
+                <div style={{ padding: '6rem 5% 4rem 5%', borderTop: '1px solid rgba(255,255,255,0.05)', background: 'var(--bg-color)' }}>
+                    <h2 style={{ fontSize: '1.25rem', marginBottom: '2rem', textAlign: 'center', textTransform: 'uppercase', letterSpacing: '0.15em', fontWeight: 600 }}>ABOVA TOP PICKS</h2>
+
+                    <div
+                        ref={scrollRef}
+                        onScroll={handleScroll}
+                        style={{
+                            display: 'flex', gap: '1rem', overflowX: 'auto', scrollSnapType: 'x mandatory',
+                            WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none', msOverflowStyle: 'none',
+                        }}
+                    >
+                        {recommendations.map((prod) => (
+                            <div key={prod.id} className="rec-card" style={{ flex: '0 0 auto', scrollSnapAlign: 'start' }}>
+                                <Link href={`/product/${prod.id}`} style={{ textDecoration: 'none' }}>
+                                    <div style={{ width: '100%', aspectRatio: '4/5', background: '#0a0a0a', borderRadius: '12px', overflow: 'hidden', marginBottom: '1rem', position: 'relative' }}>
+                                        <img src={prod.imageUrl} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
+                                    </div>
+                                    <h3 style={{ margin: 0, fontSize: '0.9rem', color: '#fff', fontWeight: 500, letterSpacing: '0.05em' }}>{prod.name}</h3>
+                                    <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>RS. {prod.price.toLocaleString('en-IN')}</p>
+                                </Link>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Swipe Progress Bar */}
+                    <div className="progress-bar-container" style={{ width: '100px', height: '2px', background: 'rgba(255,255,255,0.1)', margin: '2rem auto 0 auto', borderRadius: '2px', overflow: 'hidden' }}>
+                        <div style={{ width: '50%', height: '100%', background: '#fff', transform: `translateX(${scrollProgress}%)`, transition: 'transform 0.1s ease-out' }} />
+                    </div>
+                </div>
+            )}
 
             {/* Size Chart ModalOverlay */}
             {showSizeChart && product.sizeChartUrl && (
