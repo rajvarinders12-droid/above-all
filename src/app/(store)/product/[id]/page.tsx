@@ -53,7 +53,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         product.mainImageUrl,
         ...(product.galleryImages || []),
         ...(product.variants?.map((v: Variant) => v.imageUrl) || [])
-    ].filter(Boolean))) : [];
+    ].filter(img => img && typeof img === 'string' && img !== 'undefined' && img !== 'null'))) : [];
 
     // Fallback for cartStore
     const addItem = useCartStore(state => (state as any).addItem || (() => { }));
@@ -164,19 +164,15 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     position: sticky;
                     top: 80px;
                     height: calc(100vh - 80px);
-                    background: #111;
+                    background: var(--bg-color);
                     display: flex;
-                    align-items: center;
-                    justify-content: center;
+                    flex-direction: column;
                     overflow: hidden;
                 }
 
                 .image-section img {
-                    width: 100%;
-                    height: 100%;
                     object-fit: contain;
                     object-position: center;
-                    animation: subtleZoom 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
                 }
 
                 @keyframes subtleZoom {
@@ -457,7 +453,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     .image-section {
                         position: relative;
                         top: 0;
-                        height: 60vh;
+                        height: 75vh;
                         width: 100%;
                     }
                     .details-section {
@@ -492,7 +488,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                 {/* Immersive Image Section with Lightbox toggle & Carousel */}
                 <div className="image-section" style={{ position: 'relative' }}>
-                    <div style={{ width: '100%', height: '100%', cursor: 'zoom-in' }} onClick={() => {
+                    <div style={{ width: '100%', flex: 1, position: 'relative', cursor: 'zoom-in', background: '#111', overflow: 'hidden' }} onClick={() => {
                         const idx = allImages.indexOf(activeImage || product.mainImageUrl);
                         setLightboxIndex(idx >= 0 ? idx : 0);
                         setIsLightboxOpen(true);
@@ -502,44 +498,68 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                             src={activeImage || product.mainImageUrl}
                             alt={product.name}
                             loading="eager"
+                            style={{ width: '100%', height: '100%', objectFit: 'contain', animation: 'subtleZoom 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards' }}
                         />
+                        {/* Carousel Navigation (only if multiple images) overlay on main image */}
+                        {allImages.length > 1 && (
+                            <>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const currentIdx = allImages.indexOf(activeImage);
+                                        let prevIdx = currentIdx <= 0 ? allImages.length - 1 : currentIdx - 1;
+                                        setActiveImage(allImages[prevIdx]);
+                                    }}
+                                    style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: '#fff', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer', zIndex: 10 }}
+                                >
+                                    <ChevronLeft size={24} />
+                                </button>
+                                <button
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        const currentIdx = allImages.indexOf(activeImage);
+                                        let nextIdx = currentIdx === allImages.length - 1 ? 0 : currentIdx + 1;
+                                        setActiveImage(allImages[nextIdx]);
+                                    }}
+                                    style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: '#fff', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer', zIndex: 10 }}
+                                >
+                                    <ChevronRight size={24} />
+                                </button>
+                            </>
+                        )}
                     </div>
 
-                    {/* Carousel Navigation (only if multiple images) */}
+                    {/* Thumbnail List */}
                     {allImages.length > 1 && (
-                        <>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    const currentIdx = allImages.indexOf(activeImage);
-                                    let prevIdx = currentIdx <= 0 ? allImages.length - 1 : currentIdx - 1;
-                                    setActiveImage(allImages[prevIdx]);
-                                }}
-                                style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: '#fff', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer', zIndex: 10 }}
-                            >
-                                <ChevronLeft size={24} />
-                            </button>
-                            <button
-                                onClick={(e) => {
-                                    e.stopPropagation();
-                                    const currentIdx = allImages.indexOf(activeImage);
-                                    let nextIdx = currentIdx === allImages.length - 1 ? 0 : currentIdx + 1;
-                                    setActiveImage(allImages[nextIdx]);
-                                }}
-                                style={{ position: 'absolute', right: '1rem', top: '50%', transform: 'translateY(-50%)', background: 'rgba(0,0,0,0.3)', border: 'none', color: '#fff', padding: '0.5rem', borderRadius: '50%', cursor: 'pointer', zIndex: 10 }}
-                            >
-                                <ChevronRight size={24} />
-                            </button>
-                            <div style={{ position: 'absolute', bottom: '1.5rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', gap: '0.5rem', zIndex: 10 }}>
-                                {allImages.map((img, i) => (
-                                    <div
-                                        key={i}
-                                        onClick={(e) => { e.stopPropagation(); setActiveImage(img); }}
-                                        style={{ width: '6px', height: '6px', borderRadius: '50%', background: img === activeImage ? '#fff' : 'rgba(255,255,255,0.4)', transition: 'all 0.3s', cursor: 'pointer' }}
-                                    />
-                                ))}
-                            </div>
-                        </>
+                        <div style={{
+                            display: 'flex',
+                            gap: '1rem',
+                            padding: '1rem',
+                            overflowX: 'auto',
+                            width: '100%',
+                            background: 'var(--bg-color)',
+                            minHeight: '120px'
+                        }}>
+                            {allImages.map((img, i) => (
+                                <div
+                                    key={i}
+                                    onClick={(e) => { e.stopPropagation(); setActiveImage(img); }}
+                                    style={{
+                                        width: '80px',
+                                        height: '100px',
+                                        flexShrink: 0,
+                                        cursor: 'pointer',
+                                        borderRadius: '6px',
+                                        overflow: 'hidden',
+                                        border: img === activeImage ? '2px solid var(--text-primary)' : '2px solid transparent',
+                                        opacity: img === activeImage ? 1 : 0.6,
+                                        transition: 'all 0.3s ease'
+                                    }}
+                                >
+                                    <img src={img} alt={`Thumbnail ${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
 
@@ -630,28 +650,23 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     )}
 
                     {/* Actions */}
-                    <div className="action-buttons">
+                    <div className="action-buttons" style={{ gridTemplateColumns: '1fr' }}>
                         <button
                             onClick={handleAddToCart}
                             disabled={product.inStock !== undefined && product.inStock <= 0}
-                            className="btn-premium btn-add"
+                            className="btn-premium btn-buy"
                             style={{
-                                color: added ? '#2ecc71' : '',
-                                borderColor: added ? '#2ecc71' : ''
+                                background: added ? '#2ecc71' : 'var(--text-primary)',
+                                color: added ? '#fff' : 'var(--bg-color)',
+                                borderColor: added ? '#2ecc71' : 'var(--text-primary)',
+                                padding: '1.25rem 2rem'
                             }}
                         >
                             {(product.inStock !== undefined && product.inStock <= 0) ? 'OUT OF STOCK' : added ? (
-                                <><Check size={18} style={{ marginRight: '8px' }} /> ADDED TO BAG</>
+                                <><Check size={18} style={{ marginRight: '8px' }} /> ADDED TO CART — RS. {price.toLocaleString('en-IN')}</>
                             ) : (
-                                'ADD TO BAG'
+                                `ADD TO CART — RS. ${price.toLocaleString('en-IN')}`
                             )}
-                        </button>
-
-                        <button
-                            disabled={product.inStock !== undefined && product.inStock <= 0}
-                            className="btn-premium btn-buy"
-                        >
-                            BUY NOW
                         </button>
                     </div>
 
