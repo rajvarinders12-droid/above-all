@@ -742,7 +742,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh',
                     background: 'rgba(0,0,0,0.85)', zIndex: 10000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
                 }}>
-                    <div style={{ background: '#000', borderRadius: '12px', padding: '0', maxWidth: '1000px', width: '100%', maxHeight: '90vh', overflowY: 'auto', position: 'relative', border: '1px solid #333' }}>
+                    <div style={{ background: '#000', borderRadius: '12px', padding: '0', maxWidth: '1000px', width: '100%', maxHeight: '90vh', display: 'flex', justifyContent: 'center', alignItems: 'center', position: 'relative', border: '1px solid #333' }}>
                         <button
                             onClick={() => setShowSizeChart(false)}
                             style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'rgba(0,0,0,0.6)', width: '40px', height: '40px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', border: 'none', color: '#fff', fontSize: '2rem', cursor: 'pointer', zIndex: 10 }}
@@ -750,7 +750,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         <img
                             src={product.sizeChartUrl}
                             alt="Size Guide"
-                            style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '12px' }}
+                            style={{ maxWidth: '100%', maxHeight: '90vh', objectFit: 'contain', display: 'block', borderRadius: '12px' }}
                         />
                     </div>
                 </div>
