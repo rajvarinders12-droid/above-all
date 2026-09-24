@@ -30,34 +30,32 @@ export default function CategoryCard({ title, href, imageUrl, hoverImageUrl }: C
                 onMouseLeave={() => setIsHovered(false)}
             >
                 {/* Background Image Container */}
-                <div
+                <img
+                    src={imageUrl}
+                    alt={title}
                     style={{
                         position: 'absolute',
                         top: 0,
                         left: 0,
                         width: '100%',
                         height: '100%',
-                        backgroundImage: `url('${imageUrl}')`,
-                        backgroundPosition: 'center',
-                        backgroundSize: 'cover',
-                        backgroundRepeat: 'no-repeat',
+                        objectFit: 'cover',
                         transition: 'opacity 0.5s ease',
                         opacity: isHovered && hoverImageUrl ? 0 : 1,
                     }}
                 />
 
                 {hoverImageUrl && (
-                    <div
+                    <img
+                        src={hoverImageUrl}
+                        alt={`${title} hover`}
                         style={{
                             position: 'absolute',
                             top: 0,
                             left: 0,
                             width: '100%',
                             height: '100%',
-                            backgroundImage: `url('${hoverImageUrl}')`,
-                            backgroundPosition: 'center',
-                            backgroundSize: 'cover',
-                            backgroundRepeat: 'no-repeat',
+                            objectFit: 'cover',
                             transition: 'opacity 0.5s ease',
                             opacity: isHovered ? 1 : 0,
                         }}
