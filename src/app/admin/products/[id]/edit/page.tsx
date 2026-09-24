@@ -64,7 +64,10 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                     setDiscountedPrice(data.discountedPrice?.toString() || data.actualPrice?.toString() || data.price?.toString() || '');
                     setInStock(data.inStock?.toString() || '0');
                     setMainImageUrl(data.mainImageUrl || data.imageUrl || '');
-                    setGalleryImages((data.galleryImages || []).filter(Boolean));
+                    setGalleryImages((data.galleryImages || [])
+                        .filter(Boolean)
+                        .map((img: string) => (img.includes('.heic') || img.includes('.HEIC')) && !img.includes('f_auto') ? img.replace('/upload/', '/upload/f_auto,q_auto/') : img)
+                    );
                     setSizeChartUrl(data.sizeChartUrl || '');
                     setVariants(data.variants || []);
                     setSimpleSizes(data.sizes || []);

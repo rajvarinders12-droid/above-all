@@ -54,7 +54,9 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         product.mainImageUrl,
         ...(product.galleryImages || []),
         ...(product.variants?.map((v: Variant) => v.imageUrl) || [])
-    ].filter(img => img && typeof img === 'string' && img.trim() !== '' && img !== 'undefined' && img !== 'null'))) : [];
+    ].filter(img => img && typeof img === 'string' && img.trim() !== '' && img !== 'undefined' && img !== 'null')
+        .map(img => (img.includes('.heic') || img.includes('.HEIC')) && !img.includes('f_auto') ? img.replace('/upload/', '/upload/f_auto,q_auto/') : img)
+    )) : [];
 
     // Fallback for cartStore
     const addItem = useCartStore(state => (state as any).addItem || (() => { }));
@@ -145,8 +147,16 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         );
     }
 
-    const originalPrice = Number(product.actualPrice || product.price || 0);
-    const sellingPrice = Number(product.discountedPrice) > 0 ? Number(product.discountedPrice) : originalPrice;
+    let originalPrice = Number(product.actualPrice || product.price || 0);
+    let sellingPrice = Number(product.discountedPrice) > 0 ? Number(product.discountedPrice) : originalPrice;
+
+    // Auto-correct if user entered the prices backwards in the admin portal
+    if (sellingPrice > originalPrice && originalPrice > 0) {
+        const temp = sellingPrice;
+        sellingPrice = originalPrice;
+        originalPrice = temp;
+    }
+
     const hasDiscount = originalPrice > sellingPrice;
     const discountAmount = hasDiscount ? Math.round(((originalPrice - sellingPrice) / originalPrice) * 100) : 0;
     const price = sellingPrice;
