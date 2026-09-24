@@ -16,7 +16,20 @@ export default function CategoryCard({ title, href, imageUrl, hoverImageUrl }: C
 
     // Clean string check to prevent empty string with spaces returning true
     const validHoverUrl = hoverImageUrl?.trim() ? hoverImageUrl.trim() : null;
-    const hasValidHover = Boolean(validHoverUrl) && !hoverError;
+
+    // Auto-optimize images if they are from Cloudinary (fixes .HEIC and unsupported formats)
+    const optimizeUrl = (url: string | undefined | null) => {
+        if (!url || !url.trim()) return null;
+        const clean = url.trim();
+        if (clean.includes('cloudinary.com') && clean.includes('/upload/') && !clean.includes('/upload/f_auto')) {
+            return clean.replace('/upload/', '/upload/f_auto,q_auto/');
+        }
+        return clean;
+    };
+
+    const optimizedImageUrl = optimizeUrl(imageUrl) || imageUrl;
+    const optimizedHoverUrl = optimizeUrl(validHoverUrl);
+    const hasValidHover = Boolean(optimizedHoverUrl) && !hoverError;
 
     return (
         <Link href={href} style={{ textDecoration: 'none', color: 'white', display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -36,7 +49,7 @@ export default function CategoryCard({ title, href, imageUrl, hoverImageUrl }: C
             >
                 {/* Background Image Container */}
                 <img
-                    src={imageUrl}
+                    src={optimizedImageUrl}
                     alt={title}
                     style={{
                         position: 'absolute',
@@ -50,9 +63,9 @@ export default function CategoryCard({ title, href, imageUrl, hoverImageUrl }: C
                     }}
                 />
 
-                {hasValidHover && validHoverUrl && (
+                {hasValidHover && optimizedHoverUrl && (
                     <img
-                        src={validHoverUrl}
+                        src={optimizedHoverUrl}
                         alt={`${title} hover`}
                         onError={() => setHoverError(true)}
                         style={{
