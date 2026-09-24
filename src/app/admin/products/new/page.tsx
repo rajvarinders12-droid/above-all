@@ -263,20 +263,18 @@ export default function AddProductPage() {
                 </div>
                 <div>
                   <label className="label-clean">Category *</label>
-                  <input
-                    type="text"
-                    list="category-suggestions"
-                    placeholder="Select existing or type a new category"
+                  <select
                     required
                     value={category}
                     onChange={e => setCategory(e.target.value)}
                     className="input-clean"
-                  />
-                  <datalist id="category-suggestions">
+                    style={{ appearance: 'none', background: '#0a0a0a', cursor: 'pointer' }}
+                  >
+                    <option value="" disabled>Select a category</option>
                     {existingCategories.map((cat, i) => (
-                      <option key={i} value={cat} />
+                      <option key={i} value={cat}>{cat}</option>
                     ))}
-                  </datalist>
+                  </select>
                 </div>
                 <div>
                   <label className="label-clean">Description *</label>
