@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import './globals.css';
+import InitialLoader from '@/components/InitialLoader';
 
 const integralCF = localFont({
   src: '../../public/Integral CF Regular.woff',
@@ -33,6 +34,7 @@ export default function RootLayout({
         `}} />
       </head>
       <body>
+        <InitialLoader />
         {children}
       </body>
     </html>

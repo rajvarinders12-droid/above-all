@@ -30,12 +30,6 @@ export default function Navbar() {
 
     useEffect(() => {
         setMounted(true);
-        if (typeof window !== 'undefined' && !sessionStorage.getItem('splashShown')) {
-            // After splash animation completes (e.g., 2.5s), mark it as shown
-            setTimeout(() => {
-                sessionStorage.setItem('splashShown', 'true');
-            }, 2600);
-        }
 
         initialize();
         const handleScroll = () => {
@@ -144,21 +138,17 @@ export default function Navbar() {
                     <span style={{ transition: 'opacity 0.3s' }}>{menuOpen ? 'CLOSE' : 'MENU'}</span>
                 </div>
 
-                {/* Splash Reveal Overlay */}
-                {(!mounted || !sessionStorage.getItem('splashShown')) && (
-                    <div className="splash-overlay" />
-                )}
-
                 {/* Logo */}
-                <div className={mounted && sessionStorage.getItem('splashShown') ? '' : 'logo-anim-wrapper'} style={{ zIndex: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', position: 'absolute', left: '50%', transform: mounted && sessionStorage.getItem('splashShown') ? 'translateX(-50%)' : '' }}>
+                <div style={{ zIndex: 60, textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', cursor: 'pointer', position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
                     <Link href="/" onClick={() => setMenuOpen(false)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Image
-                            src="/abova-logo.png"
+                            src="/loader.webp"
                             alt="Above All Logo"
-                            width={160}
-                            height={50}
+                            width={140}
+                            height={45}
                             style={{ objectFit: 'contain' }}
                             priority
+                            unoptimized
                         />
                     </Link>
                 </div>
