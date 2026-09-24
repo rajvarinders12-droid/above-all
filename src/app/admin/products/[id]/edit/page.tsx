@@ -201,8 +201,8 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!name || !description || !category || !actualPrice || !inStock) {
-            return alert("Please fill in all required fields (Name, Category, Description, Price, and Inventory).");
+        if (!name || !description || !category || !discountedPrice || !inStock) {
+            return alert("Please fill in all required fields (Name, Category, Description, Selling Price, and Inventory).");
         }
         if (!mainImageUrl) return alert("Please upload a main product image.");
         setLoading(true);
@@ -214,8 +214,8 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                 description,
                 category,
                 featured,
-                actualPrice: parseFloat(actualPrice),
-                discountedPrice: parseFloat(discountedPrice) || parseFloat(actualPrice),
+                actualPrice: parseFloat(actualPrice) || parseFloat(discountedPrice),
+                discountedPrice: parseFloat(discountedPrice),
                 discountPercent,
                 inStock: parseInt(inStock),
                 mainImageUrl,
@@ -404,13 +404,13 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
 
                             <div className="admin-grid">
                                 <div>
-                                    <label className="label-clean">Price (₹) *</label>
-                                    <input type="number" step="0.01" required value={actualPrice} onChange={e => setActualPrice(e.target.value)} className="input-clean" placeholder="0.00" />
+                                    <label className="label-clean">Compare at Price (Original ₹)</label>
+                                    <input type="number" step="0.01" value={actualPrice} onChange={e => setActualPrice(e.target.value)} className="input-clean" placeholder="e.g. 100 (Optional)" />
                                 </div>
 
                                 <div style={{ position: 'relative' }}>
-                                    <label className="label-clean">Compare at Price (₹)</label>
-                                    <input type="number" step="0.01" value={discountedPrice} onChange={e => setDiscountedPrice(e.target.value)} className="input-clean" placeholder="Optional discount" />
+                                    <label className="label-clean">Actual Selling Price (₹) *</label>
+                                    <input type="number" step="0.01" required value={discountedPrice} onChange={e => setDiscountedPrice(e.target.value)} className="input-clean" placeholder="e.g. 60" />
                                     {discountPercent > 0 && (
                                         <div style={{ position: 'absolute', right: '12px', top: '38px', color: 'var(--text-secondary)', fontSize: '0.8rem', fontWeight: 500 }}>
                                             {discountPercent}% OFF

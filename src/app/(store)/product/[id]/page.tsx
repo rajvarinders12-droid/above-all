@@ -145,7 +145,11 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         );
     }
 
-    const price = Number(product.discountedPrice) > 0 ? Number(product.discountedPrice) : Number(product.actualPrice || product.price || 0);
+    const originalPrice = Number(product.actualPrice || product.price || 0);
+    const sellingPrice = Number(product.discountedPrice) > 0 ? Number(product.discountedPrice) : originalPrice;
+    const hasDiscount = originalPrice > sellingPrice;
+    const discountAmount = hasDiscount ? Math.round(((originalPrice - sellingPrice) / originalPrice) * 100) : 0;
+    const price = sellingPrice;
 
     return (
         <main style={{ minHeight: '100vh', background: 'var(--bg-color)', color: 'var(--text-primary)' }}>
@@ -575,7 +579,19 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     {/* Title and Price in Left Column for specific layout */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem', padding: '0 1rem' }}>
                         <h1 className="product-title" style={{ fontSize: 'clamp(2rem, 3vw, 2.5rem)', margin: 0 }}>{product.name}</h1>
-                        <div className="product-price" style={{ margin: 0, marginBottom: '1rem', fontSize: '1.25rem' }}>RS. {price.toLocaleString('en-IN')}</div>
+                        <div className="product-price" style={{ margin: 0, marginBottom: '1rem', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                            <span style={{ fontWeight: 600 }}>RS. {sellingPrice.toLocaleString('en-IN')}</span>
+                            {hasDiscount && (
+                                <>
+                                    <span style={{ textDecoration: 'line-through', color: 'var(--text-tertiary)', fontSize: '1.1rem' }}>
+                                        RS. {originalPrice.toLocaleString('en-IN')}
+                                    </span>
+                                    <span style={{ background: 'rgba(255, 0, 0, 0.1)', color: '#ff4d4d', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.85rem', fontWeight: 600 }}>
+                                        -{discountAmount}%
+                                    </span>
+                                </>
+                            )}
+                        </div>
                     </div>
                 </div>
 

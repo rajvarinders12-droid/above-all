@@ -63,7 +63,7 @@ export default function ProductsPage() {
                                         {product.category || 'Uncategorized'}
                                     </td>
                                     <td style={{ padding: '1rem 1.5rem' }}>
-                                        ₹{parseFloat(product.price || product.actualPrice || 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
+                                        ₹{(Number(product.discountedPrice) > 0 ? Number(product.discountedPrice) : Number(product.actualPrice || product.price || 0)).toLocaleString('en-IN', { minimumFractionDigits: 2 })}
                                     </td>
                                     <td style={{ padding: '1rem 1.5rem' }}>
                                         <div style={{ display: 'flex', gap: '0.75rem' }}>

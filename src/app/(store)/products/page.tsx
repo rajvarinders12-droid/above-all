@@ -185,7 +185,7 @@ export default function ShopPage() {
                     fetchedProds.push({
                         id: doc.id,
                         name: data.name || 'Unnamed Product',
-                        price: data.actualPrice || data.price || 0,
+                        price: data.discountedPrice > 0 ? data.discountedPrice : (data.actualPrice || data.price || 0),
                         imageUrl: data.mainImageUrl || data.imageUrl || '',
                         category: data.category || '',
                         variants: data.variants || [],
