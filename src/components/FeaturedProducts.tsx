@@ -148,18 +148,38 @@ function ProductCardItem({ product }: { product: Product }) {
             fontSize: '0.85rem',
             margin: 0,
           }}>
-            RS. {(product.price || 0).toLocaleString('en-IN')}
+            RS. {(product.discountedPrice && product.discountedPrice > 0 ? product.discountedPrice : (product.actualPrice || product.price || 0)).toLocaleString('en-IN')}
           </p>
         </Link>
         <div
-          style={{ display: 'flex', alignItems: 'flex-start', cursor: 'pointer', padding: '4px' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            cursor: 'pointer',
+            width: '36px',
+            height: '36px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(255,255,255,0.05)',
+            transition: 'background-color 0.2s ease, transform 0.2s ease',
+          }}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
             setIsQuickViewOpen(true);
           }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,1)';
+            e.currentTarget.style.transform = 'scale(1.05)';
+            e.currentTarget.querySelector('svg')!.style.stroke = '#000000';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.querySelector('svg')!.style.stroke = '#ffffff';
+          }}
         >
-          <Plus size={20} strokeWidth={1.5} color="#ffffff" style={{ marginTop: '2px' }} />
+          <Plus size={18} strokeWidth={2} color="#ffffff" style={{ transition: 'stroke 0.2s ease' }} />
         </div>
       </div>
 
