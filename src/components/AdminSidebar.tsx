@@ -7,7 +7,12 @@ import { LayoutDashboard, PackagePlus, ShoppingBag, Tag, LogOut, Layers } from '
 import { useState } from 'react';
 import { auth } from '@/lib/firebase';
 
-export default function AdminSidebar() {
+interface AdminSidebarProps {
+    isOpen?: boolean;
+    onClose?: () => void;
+}
+
+export default function AdminSidebar({ isOpen = true, onClose }: AdminSidebarProps) {
     const pathname = usePathname();
     const [hovered, setHovered] = useState<string>('');
 
@@ -20,11 +25,33 @@ export default function AdminSidebar() {
     ];
 
     return (
-        <aside style={{
+        <aside className={`admin-sidebar ${isOpen ? 'open' : ''}`} style={{
             width: '260px', height: '100%', borderRight: '1px solid #18181b',
             backgroundColor: '#000', display: 'flex', flexDirection: 'column',
-            fontFamily: 'Inter, sans-serif', flexShrink: 0
+            fontFamily: 'Inter, sans-serif', flexShrink: 0,
+            transition: 'transform 0.3s ease'
         }}>
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .admin-sidebar {
+                    position: static;
+                    transform: translateX(0);
+                    z-index: 50;
+                }
+                @media (max-width: 768px) {
+                    .admin-sidebar {
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        bottom: 0;
+                        transform: translateX(-100%);
+                    }
+                    .admin-sidebar.open {
+                        transform: translateX(0);
+                    }
+                }
+                `
+            }} />
             <div style={{
                 height: '56px', display: 'flex', alignItems: 'center', padding: '0 24px',
                 borderBottom: '1px solid #18181b', gap: '12px', color: '#fff',
@@ -58,6 +85,11 @@ export default function AdminSidebar() {
                         <Link
                             key={item.href}
                             href={item.href}
+                            onClick={() => {
+                                if (window.innerWidth <= 768 && onClose) {
+                                    onClose();
+                                }
+                            }}
                             onMouseEnter={() => setHovered(item.href)}
                             onMouseLeave={() => setHovered('')}
                             style={{
