@@ -53,7 +53,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
         product.mainImageUrl,
         ...(product.galleryImages || []),
         ...(product.variants?.map((v: Variant) => v.imageUrl) || [])
-    ].filter(img => img && typeof img === 'string' && img !== 'undefined' && img !== 'null'))) : [];
+    ].filter(img => img && typeof img === 'string' && img.trim() !== '' && img !== 'undefined' && img !== 'null'))) : [];
 
     // Fallback for cartStore
     const addItem = useCartStore(state => (state as any).addItem || (() => { }));
@@ -154,7 +154,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                 __html: `
                 .premium-product-layout {
                     display: grid;
-                    grid-template-columns: 1fr 1fr;
+                    grid-template-columns: 40% 60%;
                     grid-template-rows: auto 1fr;
                     min-height: 100vh;
                     padding-top: 80px;
@@ -453,7 +453,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                     .image-section {
                         position: relative;
                         top: 0;
-                        height: 75vh;
+                        height: 65vh;
                         width: 100%;
                     }
                     .details-section {
@@ -488,7 +488,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
 
                 {/* Immersive Image Section with Lightbox toggle & Carousel */}
                 <div className="image-section" style={{ position: 'relative' }}>
-                    <div style={{ width: '100%', flex: 1, position: 'relative', cursor: 'zoom-in', background: '#111', overflow: 'hidden' }} onClick={() => {
+                    <div style={{ width: '100%', flex: 1, position: 'relative', cursor: 'zoom-in', background: 'transparent', overflow: 'hidden' }} onClick={() => {
                         const idx = allImages.indexOf(activeImage || product.mainImageUrl);
                         setLightboxIndex(idx >= 0 ? idx : 0);
                         setIsLightboxOpen(true);
