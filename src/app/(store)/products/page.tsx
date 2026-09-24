@@ -138,7 +138,7 @@ function ProductCardItem({ product }: { product: Product }) {
                         fontSize: '0.85rem',
                         margin: 0,
                     }}>
-                        RS. {(product.price || 0).toLocaleString('en-IN')}
+                        RS. {(product.discountedPrice && product.discountedPrice > 0 ? product.discountedPrice : (product.actualPrice || product.price || 0)).toLocaleString('en-IN')}
                     </p>
                 </Link>
             </div>

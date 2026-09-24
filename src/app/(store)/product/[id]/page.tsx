@@ -805,7 +805,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                                         <img src={prod.imageUrl} alt={prod.name} style={{ width: '100%', height: '100%', objectFit: 'contain' }} />
                                     </div>
                                     <h3 style={{ margin: 0, fontSize: '0.9rem', color: '#fff', fontWeight: 500, letterSpacing: '0.05em' }}>{prod.name}</h3>
-                                    <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>RS. {prod.price.toLocaleString('en-IN')}</p>
+                                    <p style={{ margin: '0.4rem 0 0 0', fontSize: '0.85rem', color: 'rgba(255,255,255,0.6)' }}>RS. {(prod.discountedPrice > 0 ? prod.discountedPrice : prod.price).toLocaleString('en-IN')}</p>
                                 </Link>
                             </div>
                         ))}
