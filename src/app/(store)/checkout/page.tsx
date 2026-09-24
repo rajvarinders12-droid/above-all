@@ -147,7 +147,22 @@ export default function CheckoutPage() {
                     </Link>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1.2fr) minmax(0, 1fr)', gap: '4rem', alignItems: 'start' }}>
+                <style dangerouslySetInnerHTML={{
+                    __html: `
+                    .checkout-grid {
+                        display: grid;
+                        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+                        gap: 4rem;
+                        align-items: start;
+                    }
+                    @media (max-width: 768px) {
+                        .checkout-grid {
+                            grid-template-columns: 1fr;
+                            gap: 2rem;
+                        }
+                    }
+                `}} />
+                <div className="checkout-grid">
                     {/* Left Column: Forms */}
                     <form id="checkout-form" onSubmit={handleFormSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '3rem' }}>
 
