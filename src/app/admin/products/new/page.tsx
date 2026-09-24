@@ -335,8 +335,8 @@ export default function AddProductPage() {
                 <div style={{ gridColumn: '1 / -1', marginTop: '1rem' }}>
                   <label className="label-clean">Additional Gallery Images</label>
                   <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                    {galleryImages.map((img, index) => (
-                      <div key={index} style={{ width: '100px', height: '100px', borderRadius: '6px', background: `url('${img}') center/cover no-repeat`, position: 'relative' }}>
+                    {galleryImages.filter(Boolean).map((img, index) => (
+                      <div key={index} style={{ width: '100px', height: '100px', borderRadius: '6px', backgroundImage: `url('${img}')`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: '#1a1a1a', position: 'relative' }}>
                         <button type="button" onClick={() => removeGalleryImage(index)} style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: '2px solid var(--bg-color)' }}>
                           <Trash2 size={12} />
                         </button>
