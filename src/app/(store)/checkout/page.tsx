@@ -53,8 +53,9 @@ export default function CheckoutPage() {
                     shippingAddress: address,
                     createdAt: serverTimestamp()
                 });
-            } catch (e) {
+            } catch (e: any) {
                 console.error("Firebase Order Save Error:", e);
+                alert("Database Error: Could not save order. Please check Firebase Firestore Rules! Error: " + (e.message || 'permission denied'));
             }
         };
 
