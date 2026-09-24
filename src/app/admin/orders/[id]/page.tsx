@@ -59,6 +59,21 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
 
     return (
         <div className="animate-fade-in" style={{ paddingBottom: '4rem' }}>
+            <style dangerouslySetInnerHTML={{
+                __html: `
+                .order-details-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 350px;
+                    gap: 2rem;
+                    align-items: start;
+                }
+                @media (max-width: 768px) {
+                    .order-details-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                `
+            }} />
             {/* Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
                 <div>
@@ -97,7 +112,7 @@ export default function OrderDetailsPage({ params }: { params: Promise<{ id: str
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 350px', gap: '2rem', alignItems: 'start' }}>
+            <div className="order-details-grid">
 
                 {/* Left Column: Items */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>

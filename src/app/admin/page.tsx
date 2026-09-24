@@ -95,7 +95,12 @@ export default function AdminDashboard() {
             <h1 style={{ fontSize: '24px', fontWeight: 600, color: '#fff', margin: '0 0 4px 0' }}>Overview</h1>
             <p style={{ fontSize: '14px', color: '#a1a1aa', margin: 0 }}>Monitor your store metrics and track sales performance</p>
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+
+          <div className="mobile-only" style={{ backgroundColor: 'rgba(56, 189, 248, 0.1)', border: '1px solid rgba(56, 189, 248, 0.2)', padding: '10px 12px', borderRadius: '6px', color: '#38bdf8', fontSize: '12px', marginTop: '12px' }}>
+            <strong>Tip:</strong> For the best management experience, use the dashboard on a desktop device.
+          </div>
+
+          <div className="desktop-only" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button style={{
               display: 'flex', alignItems: 'center', gap: '8px', padding: '8px 12px',
               backgroundColor: '#fff', color: '#000', border: '1px solid #fff', borderRadius: '8px',

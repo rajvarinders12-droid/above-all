@@ -51,8 +51,8 @@ export default function OrdersPage() {
                     <p style={{ color: 'var(--text-secondary)', maxWidth: '400px' }}>Your store is ready! When a customer places an order, it will appear right here.</p>
                 </div>
             ) : (
-                <div className="clean-panel">
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <div className="clean-panel" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '700px' }}>
                         <thead>
                             <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                                 <th style={{ padding: '1rem 1.5rem', fontWeight: 500, width: '20%' }}>Order ID</th>

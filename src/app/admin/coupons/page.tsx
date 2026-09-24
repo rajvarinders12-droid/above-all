@@ -48,8 +48,8 @@ export default function CouponsPage() {
                     </Link>
                 </div>
             ) : (
-                <div className="clean-panel">
-                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                <div className="clean-panel" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '400px' }}>
                         <thead>
                             <tr style={{ borderBottom: '1px solid var(--border-color)', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
                                 <th style={{ padding: '1rem 1.5rem', fontWeight: 500 }}>Code</th>
