@@ -382,8 +382,11 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
                                     <label className="label-clean">Additional Gallery Images</label>
                                     <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
                                         {galleryImages.filter(Boolean).map((img, index) => (
-                                            <div key={index} style={{ width: '100px', height: '100px', borderRadius: '6px', backgroundImage: `url('${img}')`, backgroundSize: 'cover', backgroundPosition: 'center', backgroundRepeat: 'no-repeat', backgroundColor: '#1a1a1a', position: 'relative' }}>
-                                                <button type="button" onClick={() => removeGalleryImage(index)} style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: '2px solid var(--bg-color)' }}>
+                                            <div key={index} style={{ width: '100px', height: '100px', position: 'relative' }}>
+                                                <div style={{ width: '100%', height: '100%', borderRadius: '6px', backgroundColor: '#1a1a1a', overflow: 'hidden' }}>
+                                                    <img src={img} alt={`Gallery ${index}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                                                </div>
+                                                <button type="button" onClick={() => removeGalleryImage(index)} style={{ position: 'absolute', top: '-8px', right: '-8px', background: 'var(--text-primary)', color: 'var(--bg-color)', border: 'none', borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', outline: '2px solid var(--bg-color)', zIndex: 10 }}>
                                                     <Trash2 size={12} />
                                                 </button>
                                             </div>
@@ -391,7 +394,7 @@ export default function EditProductPage(props: { params: Promise<{ id: string }>
 
                                         <label className="upload-zone" style={{ width: '100px', height: '100px', minHeight: '100px', padding: 0 }}>
                                             <Plus size={24} color="var(--text-tertiary)" />
-                                            <input type="file" accept="image/*" onChange={uploadGalleryImage} style={{ display: 'none' }} />
+                                            <input type="file" accept="image/*" onChange={(e) => { uploadGalleryImage(e); e.target.value = ''; }} style={{ display: 'none' }} />
                                         </label>
                                     </div>
                                 </div>
