@@ -38,8 +38,6 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
     const [loading, setLoading] = useState(true);
 
     const [activeImage, setActiveImage] = useState<string>('');
-    const [activeTab, setActiveTab] = useState<'details' | 'washcare' | 'shipping'>('details');
-
     const [selectedColor, setSelectedColor] = useState<Variant | null>(null);
     const [selectedSize, setSelectedSize] = useState<string>('');
     const [added, setAdded] = useState(false);
@@ -586,29 +584,31 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </div>
                     )}
 
-                    {/* Title and Price in Left Column for specific layout */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '1rem', padding: '0 1rem' }}>
+
+                </div>
+
+                {/* Details Section */}
+                <div className="details-section">
+
+                    {/* Title and Price */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1.5rem' }}>
                         <h1 className="product-title" style={{ fontSize: 'clamp(2rem, 3vw, 2.5rem)', margin: 0 }}>{product.name}</h1>
-                        <div className="product-price" style={{ margin: 0, marginBottom: '1rem', fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                        <div className="product-price" style={{ margin: 0, fontSize: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                             <span style={{ fontWeight: 600 }}>RS. {sellingPrice.toLocaleString('en-IN')}</span>
                             {hasDiscount && (
                                 <>
                                     <span style={{ textDecoration: 'line-through', color: 'var(--text-tertiary)', fontSize: '1.1rem' }}>
                                         RS. {originalPrice.toLocaleString('en-IN')}
                                     </span>
-                                    <span style={{ background: 'rgba(255, 0, 0, 0.1)', color: '#ff4d4d', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.85rem', fontWeight: 600 }}>
+                                    <span style={{ background: 'rgba(255, 255, 255, 0.1)', color: 'var(--text-primary)', border: '1px solid rgba(255,255,255,0.2)', padding: '0.2rem 0.6rem', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 600, letterSpacing: '0.05em' }}>
                                         -{discountAmount}%
                                     </span>
                                 </>
                             )}
                         </div>
                     </div>
-                </div>
 
-                {/* Details Section */}
-                <div className="details-section">
-
-                    {/* DESCRIPTION moved to top of right side */}
+                    {/* DESCRIPTION */}
                     <div className="section-label">
                         <span>DESCRIPTION</span>
                     </div>
@@ -729,36 +729,7 @@ export default function ProductPage({ params }: { params: Promise<{ id: string }
                         </button>
                     </div>
 
-                    {/* Tabs / Product Features */}
-                    <div className="tabs-container" style={{ marginTop: '2rem' }}>
-                        <div className="tabs-header">
-                            <div onClick={() => setActiveTab('details')} className={`tab-item ${activeTab === 'details' ? 'active' : ''}`}>Details</div>
-                            <div onClick={() => setActiveTab('washcare')} className={`tab-item ${activeTab === 'washcare' ? 'active' : ''}`}>Washcare</div>
-                            <div onClick={() => setActiveTab('shipping')} className={`tab-item ${activeTab === 'shipping' ? 'active' : ''}`}>Shipping</div>
-                        </div>
 
-                        <div className="tab-content" key={activeTab}>
-                            {activeTab === 'details' && (
-                                <div style={{ whiteSpace: 'pre-wrap' }}>
-                                    {product.description || 'No description available for this product.'}
-                                </div>
-                            )}
-                            {activeTab === 'washcare' && (
-                                <ul style={{ paddingLeft: '1.2rem', margin: '0', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                                    <li>Machine wash cold with like colors</li>
-                                    <li>Do not bleach or dry clean</li>
-                                    <li>Tumble dry low</li>
-                                    <li>Warm iron if needed (do not iron on print)</li>
-                                </ul>
-                            )}
-                            {activeTab === 'shipping' && (
-                                <div>
-                                    <p>Free standard shipping on orders over RS. 5000.</p>
-                                    <p style={{ marginTop: '0.75rem' }}>Estimated delivery: 3-5 business days after processing.</p>
-                                </div>
-                            )}
-                        </div>
-                    </div>
                 </div>
             </div>
 
